@@ -336,7 +336,7 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden)pause()});
 
 // comic
 const INTRO=[
- {cap:"NICEVILLE, FL — Saturday",art:"👦📱🏡👴",t:"Remy is spending the summer at Grandpa Gus's house. He's on the phone with Dad, complaining that Grandpa only owns ONE TV channel.",b:"Remy: \"Dad, he watches the weather channel. For FUN.\""},
+ {cap:"NICEVILLE, FL — Saturday",art:"👦📱🏡👴",t:"Remy lives with Grandpa Gus in Niceville. He's on the phone with Dad, complaining that Grandpa only owns ONE TV channel.",b:"Remy: \"Dad, he watches the weather channel. For FUN.\""},
  {cap:"MEANWHILE, IN PAMPLICO, SC",art:"👨📞🧟🧟",t:"Dad's voice gets weird. Something is moaning in the background, and it isn't the dog.",b:"Dad: \"Remy, listen. Zombies are showing up in Pamplico! Mom, Leo and I are locking down the house. COME HOME—\" *bzzzt*"},
  {cap:"CALL DROPPED",art:"📵😱",t:"No bars. No Dad. Outside, Mrs. Henderson from next door is chewing on a mailbox.",b:"Remy: \"Dad? DAD?! ...Leo better not be eating my snacks.\""},
  {cap:"GRANDPA'S GARAGE",art:"👴🐔➡️👦",t:"Grandpa pulls a dusty box from the shelf and hands Remy... a rubber chicken launcher.",b:"Grandpa: \"I built this in '83 for exactly this day. Go get your family, kiddo. Text me when you're there. ...I don't know how to read texts.\""},
