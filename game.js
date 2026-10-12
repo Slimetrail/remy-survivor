@@ -184,7 +184,7 @@ function bullet(o){const b=obtain("b");b.hits=b.hits||[];b.hits.length=0;Object.
 // ===== Weapons =====
 function wUpdate(dt){const p=G.p,S=stat();for(const k of G.order){const w=G.w[k],L=w.lv,E=w.evo;w.cd-=dt;w.a+=dt;
  switch(k){
- case"chicken":if(w.cd<=0){w.cd=(E?.55:1.05-L*.07)*S.cd;const n=1+Math.floor(L/2)+(E?1:0);for(let i=0;i<n;i++){const t=nearest(p.x,p.y,500);const a=t?Math.atan2(t.y-p.y,t.x-p.x)+(i-(n-1)/2)*.18:Math.random()*7;
+ case"chicken":if(w.cd<=0){w.cd=(E?.42:.76-L*.05)*S.cd;const n=1+Math.floor(L/2)+(E?1:0);for(let i=0;i<n;i++){const t=nearest(p.x,p.y,500);const a=t?Math.atan2(t.y-p.y,t.x-p.x)+(i-(n-1)/2)*.18:Math.random()*7;
    bullet({k:"chicken",x:p.x,y:p.y,vx:Math.cos(a)*400,vy:Math.sin(a)*400,r:9,dmg:9+L*4+(E?10:0),pierce:1+Math.floor(L/3),spr:E?"🍗":"🐔",ex:E?55*S.area:0})}sfx("squeak")}break;
  case"banana":if(w.cd<=0){w.cd=(E?1.1:1.8-L*.1)*S.cd;const n=(E?6:1+Math.floor((L-1)/2));const base=Math.atan2(p.dy,p.dx);for(let i=0;i<n;i++){const a=base+i*Math.PI*2/n*(E?1:.35)-(E?0:(n-1)*.17);
    bullet({k:"banana",x:p.x,y:p.y,vx:Math.cos(a)*360,vy:Math.sin(a)*360,ax:-Math.cos(a)*360,ay:-Math.sin(a)*360,r:12*S.area,dmg:8+L*3+(E?12:0),pierce:999,l:2,spr:E?"🍨":"🍌",spin:1})}sfx("boing")}break;
