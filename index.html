@@ -34,6 +34,8 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 #mapC{width:360px;height:420px;max-width:96vw;background:#e7d8a8;border:4px solid #000;border-radius:8px}
 #dadNote{background:#fffbeb;color:#3b2f1e;border-radius:14px;padding:12px 16px;max-width:340px;width:90%;box-sizing:border-box;text-align:left;box-shadow:0 4px 0 #a16207;border-left:6px solid #f59e0b;flex-shrink:0}
 .dadT{font-size:13px;font-weight:800;color:#b45309;margin-bottom:4px}.dadB{font-size:17px;line-height:1.4;font-family:Georgia,serif}.dadS{text-align:right;font-style:italic;margin-top:6px;font-family:Georgia,serif}
+#verseCard{background:linear-gradient(#e9d5a1,#f5e6c4 12%,#f5e6c4 88%,#e9d5a1);color:#3f2a12;border-radius:6px;padding:14px 18px;max-width:340px;width:90%;box-sizing:border-box;text-align:center;border-top:7px solid #8b5a2b;border-bottom:7px solid #8b5a2b;box-shadow:0 4px 10px #0008;flex-shrink:0}
+.vT{font-size:13px;font-weight:800;color:#7c2d12;margin-bottom:6px}.vB{font-size:16px;line-height:1.45;font-family:Georgia,serif;font-style:italic}.vR{margin-top:8px;font-size:13px;font-weight:700;font-family:Georgia,serif}
 </style></head><body>
 <canvas id="c"></canvas>
 <button id="pauseB" class="hidden" aria-label="Pause">⏸</button>
@@ -50,12 +52,12 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <div class="screen hidden" id="shop"><h2>🛒 Garage Sale of Power</h2><p id="shopCoins" class="card"></p><div id="shopList" style="display:flex;flex-direction:column;gap:8px;align-items:center;width:100%"></div><button class="btn sm" id="shopBack">⬅ Back</button></div>
 <div class="screen hidden" id="lvl" style="background:#0d170cd0"><h2 id="lvlT">LEVEL UP! 🎉</h2><p id="lvlSub">Pick one. Choose wisely. Or don't, it's your apocalypse.</p><div id="cards" style="display:flex;flex-direction:column;gap:10px;align-items:center;width:100%"></div></div>
 <div class="screen center hidden" id="paused"><h2>⏸ Paused</h2><div id="pauseInfo" class="card" style="max-width:360px;text-align:left"></div><button class="btn" id="resumeB">▶ Resume</button><button class="btn sm alt" id="quitB">🏳️ Quit run</button></div>
-<div class="screen hidden" id="over"><h2 id="overT">GOO'D GAME 💀</h2><p id="overSub"></p><div id="dadNote" class="hidden"></div><div id="res" class="card"></div>
+<div class="screen hidden" id="over"><h2 id="overT">GOO'D GAME 💀</h2><p id="overSub"></p><div id="dadNote" class="hidden"></div><div id="verseCard" class="hidden"></div><div id="res" class="card"></div>
 <div id="ini" class="hidden"><p><b>🎉 Top 10! Pick your initials</b></p><div id="iniCols"></div><br><button class="btn" id="iniSave">✔ Save</button></div>
 <div id="overBoard"></div><div id="overBtns" style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn" id="againB">🔁 Again</button><button class="btn sm alt" id="homeB">🏠 Home</button></div></div>
 <div class="screen hidden" id="board"><h2 id="boardTitle">🏆 Top 10</h2><div id="boardList"></div><button class="btn sm" id="boardBack">⬅ Back</button></div>
-<script src="dadnotes.js?v=6"></script><script src="game.js?v=6"></script>
-<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=6');
+<script src="dadnotes.js?v=7"></script><script src="verses.js?v=7"></script><script src="game.js?v=7"></script>
+<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=7');
 let deferredPrompt=null;const ib=document.getElementById("installBtn"),hp=document.getElementById("installHelp");
 const standalone=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||navigator.standalone;
 if(standalone())ib.classList.add("hidden");
