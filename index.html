@@ -1,0 +1,64 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#1b2a1a"><link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Remy Survivor</title>
+<style>
+html,body{margin:0;height:100%;background:#1b2a1a;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;font-family:system-ui,"Comic Sans MS",sans-serif;color:#fff}
+canvas#c{display:block;width:100vw;height:100vh;height:100dvh}
+#pauseB{position:fixed;top:calc(env(safe-area-inset-top,0px) + 34px);right:8px;font-size:22px;border:0;border-radius:12px;background:#0009;color:#fff;padding:6px 11px;z-index:5}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:#0d170ce8;text-align:center;gap:9px;padding:30px 14px 20px;overflow:auto;z-index:10;box-sizing:border-box}
+.screen.center{justify-content:safe center}
+h1{font-size:46px;margin:0;color:#a3e635;text-shadow:3px 3px 0 #4c1d95,6px 6px 0 #000;line-height:1}
+h2{margin:0;color:#facc15;font-size:28px;text-shadow:2px 2px 0 #000}
+p{margin:0;font-size:16px;max-width:360px;line-height:1.4}
+.btn{font-size:22px;font-weight:900;padding:12px 30px;border:0;border-radius:30px;background:#a3e635;color:#1a2e05;box-shadow:0 5px 0 #3f6212;min-width:220px}
+.btn.sm{font-size:17px;padding:9px 20px;min-width:0}.btn.alt{background:#facc15;box-shadow:0 5px 0 #a16207;color:#422006}.btn.blue{background:#22d3ee;box-shadow:0 5px 0 #0e7490;color:#083344}
+.btn.dim{background:#334155;color:#cbd5e1;box-shadow:0 4px 0 #0f172a}.btn:disabled{opacity:.45}
+.hidden{display:none!important}
+.card{background:#0007;border-radius:14px;padding:10px 14px;font-size:16px;line-height:1.45}
+.up{display:flex;gap:10px;align-items:center;width:100%;max-width:370px;text-align:left;border:3px solid #a3e635;background:#1e293bee;color:#fff;border-radius:16px;padding:10px;font-size:15px}
+.up.evo{border-color:#f0abfc;background:linear-gradient(135deg,#581c87,#9d174d);box-shadow:0 0 18px #f0abfc}
+.up .ic{font-size:40px;width:52px;text-align:center}.up b{font-size:17px;color:#facc15}.up i{color:#a5f3fc;font-size:13px;display:block;margin-top:3px}
+.tag{font-size:12px;background:#a3e635;color:#1a2e05;border-radius:8px;padding:1px 6px;margin-left:4px;font-weight:900}
+.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#iniCols{display:flex;gap:14px;justify-content:center}.col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.col button{width:64px;height:50px;font-size:26px;border:0;border-radius:12px;background:#a3e635;color:#1a2e05;font-weight:900}
+.col .L{font-size:44px;font-weight:900;width:64px;background:#fff;color:#1b2a1a;border-radius:12px}
+table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12px}td,th{padding:4px 7px}tr.new{background:#facc15;color:#422006;font-weight:900}
+.panel{background:#fffbe6;color:#222;border:4px solid #000;border-radius:6px;box-shadow:6px 6px 0 #000;padding:12px;max-width:340px;width:90%;font-size:17px;text-align:left}
+.panel .art{font-size:60px;text-align:center;line-height:1.1}.panel .bub{background:#fff;border:2px solid #000;border-radius:14px;padding:6px 10px;margin-top:6px;font-weight:700}
+.panel .cap{background:#facc15;border:2px solid #000;padding:4px 8px;font-weight:900;display:inline-block;margin-bottom:6px;font-size:14px}
+.shopit{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;max-width:370px;background:#0007;border-radius:12px;padding:8px 10px;text-align:left;box-sizing:border-box}
+.hero{display:flex;gap:10px;align-items:center;width:100%;max-width:370px;background:#0007;border:3px solid transparent;border-radius:14px;padding:8px;text-align:left;box-sizing:border-box}.hero.sel{border-color:#facc15}
+#mapC{width:360px;height:420px;max-width:96vw;background:#e7d8a8;border:4px solid #000;border-radius:8px}
+</style></head><body>
+<canvas id="c"></canvas>
+<button id="pauseB" class="hidden" aria-label="Pause">⏸</button>
+<div class="screen center" id="title"><div style="font-size:54px">🧟‍♂️🐔🍌</div><h1>Remy<br>Survivor</h1>
+<p>Fight your way home from Niceville, FL to Pamplico, SC with the silliest weapons ever invented.</p>
+<p id="coinS" class="card">🪙 0</p>
+<div id="diffRow" class="row"></div><p id="diffInfo" style="font-size:13px;opacity:.85"></p><button class="btn" id="journeyB">🗺️ Journey Home</button><button class="btn alt" id="endlessB">♾️ Endless Mode</button>
+<div class="row"><button class="btn sm" id="heroB">🧑 Heroes</button><button class="btn sm" id="shopB">🛒 Shop</button><button class="btn sm" id="topB">🏆 Top 10</button><button class="btn sm" id="storyB">📖 Story</button></div>
+<button class="btn sm blue" id="installBtn">📲 Install app</button><div id="installHelp" class="card hidden">Tap Chrome's <b>⋮</b> menu → <b>Install app</b> / <b>Add to Home screen</b><br><small>(iPhone: Share ⬆️ → Add to Home Screen)</small><br><button class="btn sm" id="helpOk">OK</button></div>
+<button class="btn sm" id="muteB" style="background:#334155;color:#fff;box-shadow:none">🔊 Sound on</button></div>
+<div class="screen center hidden" id="comic"><div id="comicP"></div><div class="row"><button class="btn" id="comicN">Next ▶</button><button class="btn sm alt" id="comicS">Skip ⏭</button></div></div>
+<div class="screen hidden" id="map"><h2>🗺️ The Road Home</h2><canvas id="mapC" width="720" height="840"></canvas><div id="mapInfo" class="card"></div><button class="btn" id="mapGo">▶ Play stage</button><button class="btn sm" id="mapBack">⬅ Back</button></div>
+<div class="screen hidden" id="heroes"><h2>🧑 Heroes</h2><div id="heroList" style="display:flex;flex-direction:column;gap:8px;align-items:center;width:100%"></div><button class="btn sm" id="heroBack">⬅ Back</button></div>
+<div class="screen hidden" id="shop"><h2>🛒 Garage Sale of Power</h2><p id="shopCoins" class="card"></p><div id="shopList" style="display:flex;flex-direction:column;gap:8px;align-items:center;width:100%"></div><button class="btn sm" id="shopBack">⬅ Back</button></div>
+<div class="screen hidden" id="lvl" style="background:#0d170cd0"><h2 id="lvlT">LEVEL UP! 🎉</h2><p id="lvlSub">Pick one. Choose wisely. Or don't, it's your apocalypse.</p><div id="cards" style="display:flex;flex-direction:column;gap:10px;align-items:center;width:100%"></div></div>
+<div class="screen center hidden" id="paused"><h2>⏸ Paused</h2><div id="pauseInfo" class="card" style="max-width:360px;text-align:left"></div><button class="btn" id="resumeB">▶ Resume</button><button class="btn sm alt" id="quitB">🏳️ Quit run</button></div>
+<div class="screen hidden" id="over"><h2 id="overT">GOO'D GAME 💀</h2><p id="overSub"></p><div id="res" class="card"></div>
+<div id="ini" class="hidden"><p><b>🎉 Top 10! Pick your initials</b></p><div id="iniCols"></div><br><button class="btn" id="iniSave">✔ Save</button></div>
+<div id="overBoard"></div><div id="overBtns" style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn" id="againB">🔁 Again</button><button class="btn sm alt" id="homeB">🏠 Home</button></div></div>
+<div class="screen hidden" id="board"><h2 id="boardTitle">🏆 Top 10</h2><div id="boardList"></div><button class="btn sm" id="boardBack">⬅ Back</button></div>
+<script src="game.js?v=1"></script>
+<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=1');
+let deferredPrompt=null;const ib=document.getElementById("installBtn"),hp=document.getElementById("installHelp");
+const standalone=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||navigator.standalone;
+if(standalone())ib.classList.add("hidden");
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e});
+addEventListener("appinstalled",()=>{ib.classList.add("hidden");hp.classList.add("hidden");deferredPrompt=null});
+ib.onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();const r=await deferredPrompt.userChoice;deferredPrompt=null;if(r.outcome==="accepted")ib.classList.add("hidden")}else hp.classList.remove("hidden")};
+document.getElementById("helpOk").onclick=()=>hp.classList.add("hidden");
+</script></body></html>
