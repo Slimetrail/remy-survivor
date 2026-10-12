@@ -16,7 +16,9 @@ const DF=()=>DIFF[(G&&G.df)||save.diff];
 
 // ===== Audio =====
 let AC=null;const lastS={};
-function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==="suspended")AC.resume();return AC}
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==="suspended"&&!save.mute)AC.resume();return AC}
+function hudBtns(on){$("pauseB").classList.toggle("hidden",!on);$("muteHud").classList.toggle("hidden",!on)}
+function setMute(v){save.mute=v;persist();if(AC){v?AC.suspend():AC.resume()}const t=v?"🔇":"🔊";$("muteHud").textContent=t;$("muteHud").setAttribute("aria-label",v?"Sound off":"Sound on");$("muteB").textContent=v?"🔇 Sound off":"🔊 Sound on"}
 function tone(f1,f2,dur,type,vol,delay=0){const a=AC;if(!a)return;const t=a.currentTime+delay,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f2),t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+.02)}
 function noise(dur,vol,f=800){const a=AC;if(!a)return;const b=a.createBuffer(1,a.sampleRate*dur,a.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);const s=a.createBufferSource(),fl=a.createBiquadFilter(),g=a.createGain();fl.type="lowpass";fl.frequency.value=f;g.gain.value=vol;s.buffer=b;s.connect(fl).connect(g).connect(a.destination);s.start()}
 function sfx(n){if(save.mute||!AC)return;const now=performance.now();if(lastS[n]&&now-lastS[n]<60)return;lastS[n]=now;
@@ -146,13 +148,18 @@ function buildSprites(){
 function spawnZ(type,x,y,boss){const z=obtain("z"),T=ZT[type];const sc=G.mode==="journey"?G.diff:1,tm=1+G.t/100;
  const D=DF();Object.assign(z,{type,x,y,r:T.r,hp:T.hp*tm*sc*D.hp*(boss?1+G.bossN*.6:1),spd:T.spd*rnd(.9,1.1)*(type==="boss"?1:Math.min(1.5,1+G.t/900))*D.spd,dmg:T.dmg*(1+G.t/400)*D.dmg,xp:T.xp,flash:0,kx:0,ky:0,slow:0,wob:Math.random()*6,dash:0,dashCd:3,name:boss||""});
  z.max=z.hp;z.hit=z.hit||{};for(const k in z.hit)z.hit[k]=0;ent.z.push(z);return z}
-function spawnTick(dt){const t=G.t;if(G.bossAlive&&ent.z.length>120)return;
- const rate=(.8+t/30)*(G.mode==="journey"?(G.stage<2?.62:.75)+G.stage*.09:1.1);G.spawnAcc+=dt*Math.min(rate*DF().sp,36);
- while(G.spawnAcc>=1&&ent.z.length<Math.min(330,40+t*.8)){G.spawnAcc--;const a=Math.random()*7,d=Math.max(W,H)*.62+rnd(0,60);
+function edgePt(m=30){const p=G.p,hw=W/2+m,hh=H/2+m,per=2*(hw+hh),r=Math.random()*per;let x,y;if(r<2*hw){x=r-hw;y=Math.random()<.5?-hh:hh}else{y=r-2*hw-hh;x=Math.random()<.5?-hw:hw}return[p.x+x,p.y+y]}
+function waves(){const t=G.t,p=G.p;G.waveI=G.waveI||0;
+ if(G.waveI===0&&t>1.2){G.waveI=1;const n=30;for(let i=0;i<n;i++){const a=i/n*Math.PI*2;spawnZ(i%5===0?"runner":"shamb",p.x+Math.cos(a)*(W/2+25),p.y+Math.sin(a)*(H/2+25))}G.banner="🧟 THEY'RE EVERYWHERE!";G.bannerT=2;sfx("boss");G.shake=6}
+ if(G.waveI===1&&t>14){G.waveI=2;const[hx,hy]=edgePt();for(let i=0;i<14;i++)spawnZ("runner",hx+rnd(-40,40),hy+rnd(-40,40));G.banner="🏃 Runner pack!";G.bannerT=1.5}
+ if(G.waveI===2&&t>32){G.waveI=3;const n=36;for(let i=0;i<n;i++){const a=i/n*Math.PI*2;spawnZ(i%6===0?"dog":"shamb",p.x+Math.cos(a)*(W/2+25),p.y+Math.sin(a)*(H/2+25))}G.banner="🧟 Surrounded!";G.bannerT=1.5}}
+function spawnTick(dt){const t=G.t;waves();if(G.bossAlive&&ent.z.length>120)return;
+ const rate=(2.0+t/45)*(G.mode==="journey"?(G.stage<2?.62:.75)+G.stage*.09:1.1);G.spawnAcc+=dt*Math.min(rate*DF().sp,36);
+ while(G.spawnAcc>=1&&ent.z.length<Math.min(330,90+t*.6)){G.spawnAcc--;
   const pool=Object.keys(ZT).filter(k=>ZT[k].t<=t+(G.mode==="journey"?G.stage*11:0));
   let type="shamb";const r=Math.random();if(r<.45)type="shamb";else type=pick(pool);
-  if(Math.random()<.004*Math.min(1,t/60)){for(let i=0;i<10;i++)spawnZ(t>80?"dog":"runner",G.p.x+Math.cos(a)*d+rnd(-30,30),G.p.y+Math.sin(a)*d+rnd(-30,30))} // horde!
-  spawnZ(type,G.p.x+Math.cos(a)*d,G.p.y+Math.sin(a)*d)}
+  if(Math.random()<.004*Math.min(1,t/60)){const[hx,hy]=edgePt();for(let i=0;i<10;i++)spawnZ(t>80?"dog":"runner",hx+rnd(-30,30),hy+rnd(-30,30))} // horde!
+  const[ex,ey]=edgePt();spawnZ(type,ex,ey)}
  if(t>=G.nextBoss&&!G.bossAlive){const nm=G.mode==="journey"?STAGES[G.stage].boss:pick(["Big Gulp Gary","Principal Brains","Mega Mall Santa","Sir Moans-a-Lot","Grill Master Ghoul"]);
   const a=Math.random()*7;G.bossAlive=spawnZ("boss",G.p.x+Math.cos(a)*380,G.p.y+Math.sin(a)*380,nm);G.bossN++;G.banner="⚠️ BOSS: "+nm;G.bannerT=3;sfx("boss");G.shake=12;
   G.nextBoss=G.mode==="journey"?1e9:G.t+150}}
@@ -185,7 +192,7 @@ function bullet(o){const b=obtain("b");b.hits=b.hits||[];b.hits.length=0;Object.
 // ===== Weapons =====
 function wUpdate(dt){const p=G.p,S=stat();for(const k of G.order){const w=G.w[k],L=w.lv,E=w.evo;w.cd-=dt;w.a+=dt;
  switch(k){
- case"chicken":if(w.cd<=0){w.cd=(E?.25:.4-L*.02)*S.cd;const n=(L>=3?2:1)+(L>=5?1:0)+(E?1:0);G.shots=(G.shots||0)+n;const ts=nearestN(p.x,p.y,n);for(let i=0;i<n;i++){const t=ts[i%Math.max(1,ts.length)];if(!t&&i>0)break;const a=t?Math.atan2(t.y-p.y,t.x-p.x)+(ts.length<n&&i?(i%2?.15:-.15):0):Math.atan2(p.dy,p.dx);
+ case"chicken":if(w.cd<=0){w.cd=(E?.25:.4-L*.02)*S.cd;const n=(L>=3?2:1)+(L>=5?1:0)+(E?1:0);G.shots=(G.shots||0)+n;const ts=nearestN(p.x,p.y,n,Math.max(W,H)/2+20);for(let i=0;i<n;i++){const t=ts[i%Math.max(1,ts.length)];if(!t&&i>0)break;const a=t?Math.atan2(t.y-p.y,t.x-p.x)+(ts.length<n&&i?(i%2?.15:-.15):0):Math.atan2(p.dy,p.dx);
    bullet({k:"chicken",x:p.x,y:p.y,vx:Math.cos(a)*460,vy:Math.sin(a)*460,r:9,dmg:8+L*3+(E?10:0),pierce:1+Math.floor(L/3),spr:E?"🍗":"🐔",ex:E?55*S.area:0,kb:45})}sfx("squeak")}break;
  case"banana":if(w.cd<=0){w.cd=(E?1.1:1.8-L*.1)*S.cd;const n=(E?6:1+Math.floor((L-1)/2));const bt=nearest(p.x,p.y,600),base=bt?Math.atan2(bt.y-p.y,bt.x-p.x):Math.atan2(p.dy,p.dx);for(let i=0;i<n;i++){const a=base+i*Math.PI*2/n*(E?1:.35)-(E?0:(n-1)*.17);
    bullet({k:"banana",x:p.x,y:p.y,vx:Math.cos(a)*360,vy:Math.sin(a)*360,ax:-Math.cos(a)*360,ay:-Math.sin(a)*360,r:12*S.area,dmg:8+L*3+(E?12:0),pierce:999,l:2,spr:E?"🍨":"🍌",spin:1})}sfx("boing")}break;
@@ -253,7 +260,7 @@ function options(){const o=[];
  const ev=o.filter(x=>x.pri),rest=o.filter(x=>!x.pri).sort(()=>Math.random()-.5);const r=[...ev,...rest].slice(0,3);
  while(r.length<3)r.push(r.length%2?{t:"heal"}:{t:"gold"});return r}
 let chestMode=false;
-function openCards(chest){chestMode=chest;state="lvl";$("pauseB").classList.add("hidden");joy.on=false;
+function openCards(chest){chestMode=chest;state="lvl";hudBtns(false);joy.on=false;
  $("lvlT").textContent=chest?"🎁 BOSS LOOT!":"LEVEL "+G.lvl+"! 🎉";$("lvlSub").textContent=chest?"The boss dropped a goodie bag. Pick a prize!":pick(["Pick one. Choose wisely. Or don't.","The zombies will politely wait.","Your power grows. So does your weirdness.","Mom would want you to pick the healthy one."]);
  const box=$("cards");box.innerHTML="";for(const op of options()){const b=document.createElement("button");b.className="up"+(op.t==="evo"?" evo":"");let ic,nm,ds,fl,tg="";
   if(op.t==="evo"){const W=W8[op.k];ic=W.ei;nm=W.en;ds="EVOLVE "+W.n+" + "+PS[W.evo].n;fl=W.ef;tg="EVOLVE!"}
@@ -266,7 +273,7 @@ function openCards(chest){chestMode=chest;state="lvl";$("pauseB").classList.add(
 function choose(op){if(op.t==="evo"){G.w[op.k].evo=true;G.banner="✨ "+W8[op.k].en+"!";G.bannerT=2.5;sfx("win")}
  else if(op.t==="w"){if(G.w[op.k])G.w[op.k].lv++;else addWeapon(op.k)}else if(op.t==="p"){G.ps[op.k]=(G.ps[op.k]||0)+1;if(op.k==="wrap"){G.p.armor++;G.p.maxHp+=15;G.p.hp+=15}}
  else if(op.t==="heal")G.p.hp=Math.min(G.p.maxHp,G.p.hp+40);else G.coins+=15;
- hideAll();state="play";$("pauseB").classList.remove("hidden");last=performance.now()}
+ hideAll();state="play";hudBtns(true);last=performance.now()}
 
 // ===== Main loop =====
 let last=performance.now(),fps=60;
@@ -327,12 +334,12 @@ function hud(){const p=G.p,top=0;cx.fillStyle="#0009";cx.fillRect(0,top,W,28);cx
 const SCR=["title","comic","map","heroes","shop","lvl","paused","over","board"];
 function hideAll(){SCR.forEach(s=>$(s).classList.add("hidden"))}
 function show(s){hideAll();$(s).classList.remove("hidden")}
-function goTitle(){state="title";G=null;$("pauseB").classList.add("hidden");$("coinS").textContent="🪙 "+save.coins+" coins  •  Hero: "+HEROES[save.hero].i+" "+HEROES[save.hero].n;renderDiff();$("muteB").textContent=save.mute?"🔇 Sound off":"🔊 Sound on";
+function goTitle(){state="title";G=null;hudBtns(false);$("coinS").textContent="🪙 "+save.coins+" coins  •  Hero: "+HEROES[save.hero].i+" "+HEROES[save.hero].n;renderDiff();setMute(save.mute);
  cx.setTransform(DPR,0,0,DPR,0,0);cx.fillStyle="#1b2a1a";cx.fillRect(0,0,W,H);show("title")}
-function startRun(mode){ac();newRun(mode);hideAll();state="play";$("pauseB").classList.remove("hidden");last=performance.now()}
-function pause(){if(state!=="play")return;state="paused";joy.on=false;$("pauseB").classList.add("hidden");
+function startRun(mode){ac();newRun(mode);hideAll();state="play";hudBtns(true);last=performance.now()}
+function pause(){if(state!=="play")return;state="paused";joy.on=false;hudBtns(false);
  $("pauseInfo").innerHTML="<b>Weapons:</b><br>"+G.order.map(k=>(G.w[k].evo?W8[k].ei+" "+W8[k].en:W8[k].i+" "+W8[k].n+" Lv "+G.w[k].lv)).join("<br>")+"<br><b>Gear:</b><br>"+(Object.keys(G.ps).map(k=>PS[k].i+" "+PS[k].n+" Lv "+G.ps[k]).join("<br>")||"none yet");show("paused")}
-$("pauseB").onclick=pause;$("resumeB").onclick=()=>{hideAll();state="play";$("pauseB").classList.remove("hidden");last=performance.now()};$("quitB").onclick=()=>endRun(false,true);
+$("pauseB").onclick=pause;$("resumeB").onclick=()=>{hideAll();state="play";hudBtns(true);last=performance.now()};$("quitB").onclick=()=>endRun(false,true);
 document.addEventListener("visibilitychange",()=>{if(document.hidden)pause()});
 
 // comic
@@ -367,7 +374,7 @@ $("mapC").onclick=e=>{const r=e.target.getBoundingClientRect(),x=(e.clientX-r.le
 $("journeyB").onclick=()=>{ac();if(!save.seenIntro){comic(INTRO,()=>{save.seenIntro=true;persist();openMap()})}else openMap()};
 $("storyB").onclick=()=>{ac();comic(INTRO,()=>{save.seenIntro=true;persist();goTitle()})};
 $("mapGo").onclick=()=>startRun("journey");$("mapBack").onclick=goTitle;$("endlessB").onclick=()=>startRun("endless");
-$("muteB").onclick=()=>{save.mute=!save.mute;persist();ac();goTitle()};
+$("muteB").onclick=()=>{ac();setMute(!save.mute)};$("muteHud").onclick=e=>{e.stopPropagation();ac();setMute(!save.mute)};
 
 function renderDiff(){const r=$("diffRow");r.innerHTML="";for(const k in DIFF){const b=document.createElement("button");b.className="btn sm"+(save.diff===k?"":" dim");b.dataset.d=k;b.textContent=DIFF[k].n;b.onclick=()=>{save.diff=k;persist();sfx("boing");goTitle()};r.appendChild(b)}
  $("diffInfo").textContent="Coins x"+DIFF[save.diff].coin+" • Journey: "+prog().cleared.length+"/"+STAGES.length+" towns cleared"}
@@ -386,7 +393,7 @@ function bagPick(N,key){N=N||[];if(!N.length)return null;let bag=LS.get(key+"bag
 // end of run & board
 let pendingScore=null;
 function score(){return Math.floor(G.t)*10+G.kills*2+G.lvl*50}
-function endRun(won,quit){if(state==="over")return;state="over";$("pauseB").classList.add("hidden");const earned=Math.round((G.coins+Math.floor(G.kills/15*stat().coin)+(won?50+G.stage*20:0))*DF().coin);save.coins+=earned;
+function endRun(won,quit){if(state==="over")return;state="over";hudBtns(false);const earned=Math.round((G.coins+Math.floor(G.kills/15*stat().coin)+(won?50+G.stage*20:0))*DF().coin);save.coins+=earned;
  let finale=false;if(won&&G.mode==="journey"){if(!prog().cleared.includes(G.stage))prog().cleared.push(G.stage);if(G.stage===LAST)finale=true;else prog().stage=Math.max(prog().stage,G.stage+1)}persist();
  const mm=Math.floor(G.t/60),ss=String(Math.floor(G.t%60)).padStart(2,"0");const sc=score();
  const dn=$("dadNote");if(!won&&!quit){const n=nextDadNote();if(n){dn.innerHTML='<div class="dadT">💌 A note from Dad</div><div class="dadB"></div><div class="dadS">— Dad</div>';dn.querySelector(".dadB").textContent=n;dn.classList.remove("hidden")}else dn.classList.add("hidden")}else dn.classList.add("hidden");
@@ -410,4 +417,4 @@ $("topB").onclick=()=>{$("boardTitle").textContent="🏆 Top 10 — "+DIFF[save.
 
 buildSprites();goTitle();requestAnimationFrame(loop);
 // test hooks
-window.__rs={bagPick,nearest,prog,get G(){return G},get state(){return state},ent,save:()=>save,options,choose,spawnZ,openCards,endRun,stat,fps:()=>fps};
+window.__rs={setMute,get AC(){return AC},bagPick,nearest,prog,get G(){return G},get state(){return state},ent,save:()=>save,options,choose,spawnZ,openCards,endRun,stat,fps:()=>fps};

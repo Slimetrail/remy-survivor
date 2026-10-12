@@ -6,6 +6,7 @@
 <style>
 html,body{margin:0;height:100%;background:#1b2a1a;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;font-family:system-ui,"Comic Sans MS",sans-serif;color:#fff}
 canvas#c{display:block;width:100vw;height:100vh;height:100dvh}
+#muteHud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 34px);right:58px;font-size:22px;border:0;border-radius:12px;background:#0009;color:#fff;padding:6px 11px;z-index:5}
 #pauseB{position:fixed;top:calc(env(safe-area-inset-top,0px) + 34px);right:8px;font-size:22px;border:0;border-radius:12px;background:#0009;color:#fff;padding:6px 11px;z-index:5}
 .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:#0d170ce8;text-align:center;gap:9px;padding:30px 14px 20px;overflow:auto;z-index:10;box-sizing:border-box}
 .screen.center{justify-content:safe center}
@@ -38,14 +39,14 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 .vT{font-size:13px;font-weight:800;color:#7c2d12;margin-bottom:6px}.vB{font-size:16px;line-height:1.45;font-family:Georgia,serif;font-style:italic}.vR{margin-top:8px;font-size:13px;font-weight:700;font-family:Georgia,serif}
 </style></head><body>
 <canvas id="c"></canvas>
-<button id="pauseB" class="hidden" aria-label="Pause">⏸</button>
+<button id="pauseB" class="hidden" aria-label="Pause">⏸</button><button id="muteHud" class="hidden" aria-label="Sound on">🔊</button>
 <div class="screen center" id="title"><div style="font-size:54px">🧟‍♂️🐔🍌</div><h1>Remy<br>Survivor</h1>
 <p>Fight your way home from Niceville, FL to Pamplico, SC with the silliest weapons ever invented.</p>
 <p id="coinS" class="card">🪙 0</p>
 <div id="diffRow" class="row"></div><p id="diffInfo" style="font-size:13px;opacity:.85"></p><button class="btn" id="journeyB">🗺️ Journey Home</button><button class="btn alt" id="endlessB">♾️ Endless Mode</button>
 <div class="row"><button class="btn sm" id="heroB">🧑 Heroes</button><button class="btn sm" id="shopB">🛒 Shop</button><button class="btn sm" id="topB">🏆 Top 10</button><button class="btn sm" id="storyB">📖 Story</button></div>
 <button class="btn sm blue" id="installBtn">📲 Install app</button><div id="installHelp" class="card hidden">Tap Chrome's <b>⋮</b> menu → <b>Install app</b> / <b>Add to Home screen</b><br><small>(iPhone: Share ⬆️ → Add to Home Screen)</small><br><button class="btn sm" id="helpOk">OK</button></div>
-<button class="btn sm" id="muteB" style="background:#334155;color:#fff;box-shadow:none">🔊 Sound on</button></div>
+<button class="btn sm" id="muteB" style="background:#334155;color:#fff;box-shadow:0 4px 0 #0f172a;font-size:20px">🔊 Sound on</button></div>
 <div class="screen center hidden" id="comic"><div id="comicP"></div><div class="row"><button class="btn" id="comicN">Next ▶</button><button class="btn sm alt" id="comicS">Skip ⏭</button></div></div>
 <div class="screen hidden" id="map"><h2>🗺️ The Road Home</h2><canvas id="mapC" width="720" height="840"></canvas><div id="mapInfo" class="card"></div><button class="btn" id="mapGo">▶ Play stage</button><button class="btn sm" id="mapBack">⬅ Back</button></div>
 <div class="screen hidden" id="heroes"><h2>🧑 Heroes</h2><div id="heroList" style="display:flex;flex-direction:column;gap:8px;align-items:center;width:100%"></div><button class="btn sm" id="heroBack">⬅ Back</button></div>
@@ -56,8 +57,8 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <div id="ini" class="hidden"><p><b>🎉 Top 10! Pick your initials</b></p><div id="iniCols"></div><br><button class="btn" id="iniSave">✔ Save</button></div>
 <div id="overBoard"></div><div id="overBtns" style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn" id="againB">🔁 Again</button><button class="btn sm alt" id="homeB">🏠 Home</button></div></div>
 <div class="screen hidden" id="board"><h2 id="boardTitle">🏆 Top 10</h2><div id="boardList"></div><button class="btn sm" id="boardBack">⬅ Back</button></div>
-<script src="dadnotes.js?v=7"></script><script src="verses.js?v=7"></script><script src="game.js?v=7"></script>
-<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=7');
+<script src="dadnotes.js?v=8"></script><script src="verses.js?v=8"></script><script src="game.js?v=8"></script>
+<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=8');
 let deferredPrompt=null;const ib=document.getElementById("installBtn"),hp=document.getElementById("installHelp");
 const standalone=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||navigator.standalone;
 if(standalone())ib.classList.add("hidden");
