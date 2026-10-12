@@ -78,19 +78,19 @@ const ZT={ // zombie types
  dog:{r:10,hp:10,spd:120,dmg:6,xp:1,c:"#8d6e4c",t:80},
  clown:{r:13,hp:22,spd:60,dmg:9,xp:2,c:"#e8e8e8",t:110},
  tank:{r:18,hp:90,spd:38,dmg:15,xp:5,c:"#6d8f5a",t:140},
- boss:{r:42,hp:1400,spd:62,dmg:25,xp:40,c:"#557a46",t:9e9}};
+ boss:{r:42,hp:650,spd:60,dmg:18,xp:40,c:"#557a46",t:9e9}};
 
 // ===== State =====
 let G=null,state="title";
 const ent={z:[],b:[],gem:[],part:[],txt:[],zone:[],tur:[],beam:[],item:[]};
 function shopLv(k){return save.shop[k]||0}
 function newRun(mode){const h=HEROES[save.hero];const st=mode==="journey"?prog().stage:-1;
- G={mode,stage:st,t:0,kills:0,lvl:1,xp:0,xpN:6,coins:0,shake:0,spawnAcc:0,bossN:0,bossAlive:null,nextBoss:st>=0?STAGES[st].tm:150,won:false,revive:shopLv("rev")>0,
+ G={mode,stage:st,t:0,kills:0,lvl:1,xp:0,xpN:3,coins:0,shake:0,spawnAcc:0,bossN:0,bossAlive:null,nextBoss:st>=0?STAGES[st].tm:150,won:false,revive:shopLv("rev")>0,
   p:{x:0,y:0,r:14,hp:0,maxHp:h.hp+shopLv("hp")*10,spd:h.spd*(1+shopLv("spd")*.04),armor:h.armor||0,inv:0,face:1,dx:1,dy:0,walk:0},
   w:{},ps:{},order:[],banner:null,bannerT:0,dmgMul:1+shopLv("dmg")*.06,magBase:1+shopLv("mag")*.15,hero:save.hero,diff:st>=0?1+st*.17:1,df:save.diff};
  G.p.hp=G.p.maxHp;for(const k in ent)ent[k].length=0;addWeapon(h.w);
  G.banner=st>=0?"📍 "+STAGES[st].n:"♾️ Endless Mode";G.bannerT=3}
-function stat(){const p=G.ps,h=HEROES[G.hero];return{dmg:G.dmgMul*(1+.12*(p.spicy||0)),spd:1+.1*(p.sneakers||0),mag:70*G.magBase*(1+.35*(p.tinfoil||0)),regen:.5*(p.catfood||0),
+function stat(){const p=G.ps,h=HEROES[G.hero];return{dmg:G.dmgMul*(1+.12*(p.spicy||0)),spd:1+.1*(p.sneakers||0),mag:90*G.magBase*(1+.35*(p.tinfoil||0)),regen:.5*(p.catfood||0),
  area:(1+(h.area||0))*(1+.12*(p.disco||0)),cd:Math.pow(.92,p.coffee||0),crit:.05+.06*(p.sock||0),coin:(1+.15*(p.sock||0))*(1+shopLv("greed")*.1)}}
 function addWeapon(k){G.w[k]={lv:1,cd:0,evo:false,a:0};G.order.push(k)}
 
@@ -100,7 +100,7 @@ cv.addEventListener("pointerdown",e=>{ac();if(state!=="play")return;joy.on=true;
 cv.addEventListener("pointermove",e=>{if(joy.on&&e.pointerId===joy.id){joy.x=e.clientX;joy.y=e.clientY}});
 const jend=e=>{if(e.pointerId===joy.id)joy.on=false};cv.addEventListener("pointerup",jend);cv.addEventListener("pointercancel",jend);
 addEventListener("keydown",e=>{keys[e.key.toLowerCase()]=1;if((e.key==="Escape"||e.key==="p")&&state==="play")pause()});addEventListener("keyup",e=>keys[e.key.toLowerCase()]=0);
-function inputDir(){let x=0,y=0;if(joy.on){x=joy.x-joy.bx;y=joy.y-joy.by;const d=Math.hypot(x,y);if(d<6)return[0,0];const m=Math.min(1,d/50);return[x/d*m,y/d*m]}
+function inputDir(){if(window.__botDir)return window.__botDir();let x=0,y=0;if(joy.on){x=joy.x-joy.bx;y=joy.y-joy.by;const d=Math.hypot(x,y);if(d<6)return[0,0];const m=Math.min(1,d/50);return[x/d*m,y/d*m]}
  if(keys.a||keys.arrowleft)x--;if(keys.d||keys.arrowright)x++;if(keys.w||keys.arrowup)y--;if(keys.s||keys.arrowdown)y++;const d=Math.hypot(x,y);return d?[x/d,y/d]:[0,0]}
 
 // ===== Pools =====
@@ -147,8 +147,8 @@ function spawnZ(type,x,y,boss){const z=obtain("z"),T=ZT[type];const sc=G.mode===
  const D=DF();Object.assign(z,{type,x,y,r:T.r,hp:T.hp*tm*sc*D.hp*(boss?1+G.bossN*.6:1),spd:T.spd*rnd(.9,1.1)*(type==="boss"?1:Math.min(1.5,1+G.t/900))*D.spd,dmg:T.dmg*(1+G.t/400)*D.dmg,xp:T.xp,flash:0,kx:0,ky:0,slow:0,wob:Math.random()*6,dash:0,dashCd:3,name:boss||""});
  z.max=z.hp;z.hit=z.hit||{};for(const k in z.hit)z.hit[k]=0;ent.z.push(z);return z}
 function spawnTick(dt){const t=G.t;if(G.bossAlive&&ent.z.length>120)return;
- const rate=(1.3+t/14)*(G.mode==="journey"?.85+G.stage*.062:1);G.spawnAcc+=dt*Math.min(rate*DF().sp,36);
- while(G.spawnAcc>=1&&ent.z.length<330){G.spawnAcc--;const a=Math.random()*7,d=Math.max(W,H)*.62+rnd(0,60);
+ const rate=(.8+t/30)*(G.mode==="journey"?(G.stage<2?.62:.75)+G.stage*.09:1.1);G.spawnAcc+=dt*Math.min(rate*DF().sp,36);
+ while(G.spawnAcc>=1&&ent.z.length<Math.min(330,40+t*.8)){G.spawnAcc--;const a=Math.random()*7,d=Math.max(W,H)*.62+rnd(0,60);
   const pool=Object.keys(ZT).filter(k=>ZT[k].t<=t+(G.mode==="journey"?G.stage*11:0));
   let type="shamb";const r=Math.random();if(r<.45)type="shamb";else type=pick(pool);
   if(Math.random()<.004*Math.min(1,t/60)){for(let i=0;i<10;i++)spawnZ(t>80?"dog":"runner",G.p.x+Math.cos(a)*d+rnd(-30,30),G.p.y+Math.sin(a)*d+rnd(-30,30))} // horde!
@@ -176,17 +176,18 @@ function killZ(z){G.kills++;const col=z.type==="clown"?"#f472b6":z.type==="bloat
 function dropGem(x,y,v){if(ent.gem.length>400){const g=ent.gem[Math.floor(Math.random()*ent.gem.length)];g.v+=v;return}const g=obtain("gem");Object.assign(g,{x,y,v,pull:false});ent.gem.push(g)}
 function item(x,y,k){const o=obtain("item");Object.assign(o,{x,y,k,l:30,pull:false});ent.item.push(o)}
 function zone(x,y,r,l,dmg,k,slow=0){const o=obtain("zone");Object.assign(o,{x,y,r,l,ml:l,dmg,k,slow});ent.zone.push(o);return o}
-function hitPlayer(d){const p=G.p;if(p.inv>0)return;d=Math.max(1,d-p.armor);p.hp-=d;p.inv=.5;G.shake=Math.max(G.shake,6);sfx("hurt");txt(p.x,p.y-20,"-"+Math.round(d),"#f87171");
+function hitPlayer(d){const p=G.p;if(p.inv>0)return;d=Math.max(1,d-p.armor);p.hp-=d;p.inv=.5;for(const z of ent.z){if(z.hp>0&&z.type!=="boss"){const dx=z.x-p.x,dy=z.y-p.y,dd=dx*dx+dy*dy;if(dd<70*70){const l=Math.sqrt(dd)||1;z.kx+=dx/l*90;z.ky+=dy/l*90}}}G.shake=Math.max(G.shake,6);sfx("hurt");txt(p.x,p.y-20,"-"+Math.round(d),"#f87171");
  if(p.hp<=0){if(G.revive){G.revive=false;p.hp=p.maxHp*.5;p.inv=2;G.banner="🧃 Juice box revive!";G.bannerT=2;aoe(p.x,p.y,250,999,"rev",200)}else endRun(false)}}
+function nearestN(x,y,n,maxD=900){const out=[];for(const z of ent.z){if(z.hp<=0)continue;const d=(z.x-x)**2+(z.y-y)**2;if(d>maxD*maxD)continue;out.push([d,z])}out.sort((a,b)=>a[0]-b[0]);return out.slice(0,n).map(o=>o[1])}
 function nearest(x,y,maxD=1e9){let b=null,bd=maxD*maxD;for(const z of ent.z){if(z.hp<=0)continue;const d=(z.x-x)**2+(z.y-y)**2;if(d<bd){bd=d;b=z}}return b}
 function bullet(o){const b=obtain("b");b.hits=b.hits||[];b.hits.length=0;Object.assign(b,{spin:0,ret:0,pierce:1,l:2,kb:30,gx:0,gy:0,t:0,slow:0},o);ent.b.push(b);return b}
 
 // ===== Weapons =====
 function wUpdate(dt){const p=G.p,S=stat();for(const k of G.order){const w=G.w[k],L=w.lv,E=w.evo;w.cd-=dt;w.a+=dt;
  switch(k){
- case"chicken":if(w.cd<=0){w.cd=(E?.42:.76-L*.05)*S.cd;const n=1+Math.floor(L/2)+(E?1:0);for(let i=0;i<n;i++){const t=nearest(p.x,p.y,500);const a=t?Math.atan2(t.y-p.y,t.x-p.x)+(i-(n-1)/2)*.18:Math.random()*7;
-   bullet({k:"chicken",x:p.x,y:p.y,vx:Math.cos(a)*400,vy:Math.sin(a)*400,r:9,dmg:9+L*4+(E?10:0),pierce:1+Math.floor(L/3),spr:E?"🍗":"🐔",ex:E?55*S.area:0})}sfx("squeak")}break;
- case"banana":if(w.cd<=0){w.cd=(E?1.1:1.8-L*.1)*S.cd;const n=(E?6:1+Math.floor((L-1)/2));const base=Math.atan2(p.dy,p.dx);for(let i=0;i<n;i++){const a=base+i*Math.PI*2/n*(E?1:.35)-(E?0:(n-1)*.17);
+ case"chicken":if(w.cd<=0){w.cd=(E?.25:.4-L*.02)*S.cd;const n=(L>=3?2:1)+(L>=5?1:0)+(E?1:0);G.shots=(G.shots||0)+n;const ts=nearestN(p.x,p.y,n);for(let i=0;i<n;i++){const t=ts[i%Math.max(1,ts.length)];if(!t&&i>0)break;const a=t?Math.atan2(t.y-p.y,t.x-p.x)+(ts.length<n&&i?(i%2?.15:-.15):0):Math.atan2(p.dy,p.dx);
+   bullet({k:"chicken",x:p.x,y:p.y,vx:Math.cos(a)*460,vy:Math.sin(a)*460,r:9,dmg:8+L*3+(E?10:0),pierce:1+Math.floor(L/3),spr:E?"🍗":"🐔",ex:E?55*S.area:0,kb:45})}sfx("squeak")}break;
+ case"banana":if(w.cd<=0){w.cd=(E?1.1:1.8-L*.1)*S.cd;const n=(E?6:1+Math.floor((L-1)/2));const bt=nearest(p.x,p.y,600),base=bt?Math.atan2(bt.y-p.y,bt.x-p.x):Math.atan2(p.dy,p.dx);for(let i=0;i<n;i++){const a=base+i*Math.PI*2/n*(E?1:.35)-(E?0:(n-1)*.17);
    bullet({k:"banana",x:p.x,y:p.y,vx:Math.cos(a)*360,vy:Math.sin(a)*360,ax:-Math.cos(a)*360,ay:-Math.sin(a)*360,r:12*S.area,dmg:8+L*3+(E?12:0),pierce:999,l:2,spr:E?"🍨":"🍌",spin:1})}sfx("boing")}break;
  case"whoopee":if(w.cd<=0){w.cd=(E?.9:1.6-L*.1)*S.cd;const R=(65+L*10+(E?50:0))*S.area;aoe(p.x,p.y,R,6+L*3+(E?10:0),null,E?110:70);zone(p.x,p.y,R,.35,0,"toot");sfx("toot");if(E)G.shake=Math.max(G.shake,3)}break;
  case"plunger":{const n=Math.min(6,1+L+(E?2:0)),R=(70+L*4+(E?20:0))*S.area,sp=(2.6+L*.2+(E?1.5:0));w.n=n;w.R=R;w.ang=(w.ang||0)+sp*dt;
@@ -196,10 +197,10 @@ function wUpdate(dt){const p=G.p,S=stat();for(const k of G.order){const w=G.w[k]
  case"pie":if(w.cd<=0){w.cd=(E?.8:2-L*.15)*S.cd;const n=1+Math.floor(L/3)+(E?2:0);for(let i=0;i<n;i++){const t=pick(ent.z.filter(z=>z.hp>0&&Math.abs(z.x-p.x)<W/2&&Math.abs(z.y-p.y)<H/2).slice(0,40))||{x:p.x+rnd(-150,150),y:p.y+rnd(-150,150)};
    bullet({k:"pie",x:p.x,y:p.y,sx:p.x,sy:p.y,gx:t.x,gy:t.y,vx:0,vy:0,r:0,l:.65,ml:.65,dmg:14+L*6+(E?15:0),spr:"🥧",ex:(50+L*5)*S.area*(E?1.3:1),heal:E})}}break;
  case"bubble":if(w.cd<=0){w.cd=(E?.25:1-L*.08)*S.cd;const n=E?2:1;for(let i=0;i<n;i++){const a=Math.random()*7;bullet({k:"bubble",x:p.x,y:p.y,vx:Math.cos(a)*90,vy:Math.sin(a)*90,r:(10+L*2)*S.area,dmg:6+L*2.5+(E?6:0),pierce:3+L,l:4,slow:1.5})}sfx("bubble")}break;
- case"kitty":if(w.cd<=0){w.cd=(E?1:2.6-L*.2)*S.cd;const n=E?4:1+Math.floor(L/3);for(let i=0;i<n;i++){const t=nearest(p.x,p.y,450);const a=t&&i===0?Math.atan2(t.y-p.y,t.x-p.x):Math.random()*7,len=420,wd=(10+L*2)*S.area*(E?1.6:1);
+ case"kitty":if(w.cd<=0){w.cd=(E?1:2.6-L*.2)*S.cd;const n=E?4:1+Math.floor(L/3);for(let i=0;i<n;i++){const t=nearest(p.x,p.y,900);const a=t&&i===0?Math.atan2(t.y-p.y,t.x-p.x):Math.random()*7,len=420,wd=(10+L*2)*S.area*(E?1.6:1);
    const bm=obtain("beam");Object.assign(bm,{x:p.x,y:p.y-26,a,len,wd,l:.3});ent.beam.push(bm);const ca=Math.cos(a),sa=Math.sin(a);
    for(const z of ent.z){if(z.hp<=0)continue;const rx=z.x-bm.x,ry=z.y-bm.y,along=rx*ca+ry*sa,perp=Math.abs(-rx*sa+ry*ca);if(along>0&&along<len&&perp<wd+z.r)hurt(z,16+L*7+(E?20:0),null,20,bm.x,bm.y)}}sfx("laser")}break;
- case"flip":if(w.cd<=0){w.cd=(E?.7:1.5-L*.1)*S.cd;const n=1+Math.floor(L/2)+(E?2:0);for(let i=0;i<n;i++){const a=Math.random()*7;bullet({k:"flip",x:p.x,y:p.y,vx:Math.cos(a)*300,vy:Math.sin(a)*300,r:11,dmg:10+L*3+(E?8:0),pierce:2,l:.8,spr:"🩴",spin:1,fire:(30+L*4)*S.area*(E?1.4:1),fd:3+L+(E?6:0)})}sfx("fire")}break;}}}
+ case"flip":if(w.cd<=0){w.cd=(E?.7:1.5-L*.1)*S.cd;const n=1+Math.floor(L/2)+(E?2:0);const ft=nearestN(p.x,p.y,n,700);for(let i=0;i<n;i++){const t=ft[i];const a=t?Math.atan2(t.y-p.y,t.x-p.x)+rnd(-.2,.2):Math.random()*7;bullet({k:"flip",x:p.x,y:p.y,vx:Math.cos(a)*300,vy:Math.sin(a)*300,r:11,dmg:10+L*3+(E?8:0),pierce:2,l:.8,spr:"🩴",spin:1,fire:(30+L*4)*S.area*(E?1.4:1),fd:3+L+(E?6:0)})}sfx("fire")}break;}}}
 function bUpdate(dt){const S=stat();
  for(let i=ent.b.length-1;i>=0;i--){const b=ent.b[i];b.l-=dt;b.t+=dt;
   if(b.k==="banana"){b.vx+=b.ax*dt;b.vy+=b.ay*dt}
@@ -229,7 +230,7 @@ function zUpdate(dt){const p=G.p;grid.clear();
   if(z.type==="clown"){const px=-dy/d,py=dx/d,s=Math.sin(z.wob*.7)*.9;dx+=px*s*d;dy+=py*s*d}
   if(z.type==="dog"&&d<160&&d>60)sp*=1.4;
   if(z.type==="boss"){z.dashCd-=dt;if(z.dashCd<=0&&z.dash<=0){z.dash=.7;z.dashCd=4.5;z.dvx=dx/d;z.dvy=dy/d;txt(z.x,z.y-z.r-10,pick(["BRAAAINS!","HERE'S JOHNNY-BRAIN!","CHARGE!!","NOM TIME"]),"#f87171")}
-   if(z.dash>0){z.dash-=dt;z.x+=z.dvx*330*dt;z.y+=z.dvy*330*dt}if(Math.random()<dt*.4&&ent.z.length<300)spawnZ("shamb",z.x+rnd(-40,40),z.y+rnd(-40,40))}
+   if(z.dash>0){z.dash-=dt;z.x+=z.dvx*330*dt;z.y+=z.dvy*330*dt}if(Math.random()<dt*(G.stage>=0&&G.stage<2?.2:.4)&&ent.z.length<300)spawnZ("shamb",z.x+rnd(-40,40),z.y+rnd(-40,40))}
   const l=Math.hypot(dx,dy)||1;z.x+=dx/l*sp*dt+z.kx*dt*8;z.y+=dy/l*sp*dt+z.ky*dt*8;z.kx*=.82;z.ky*=.82;
   if(d<z.r+p.r)hitPlayer(z.dmg);
   const key=((z.x/40)|0)*73856093^((z.y/40)|0)*19349663;let c=grid.get(key);if(!c){c=[];grid.set(key,c)}if(c.length<8)c.push(z)}
@@ -243,7 +244,7 @@ function pickups(dt){const p=G.p,S=stat(),M=S.mag;
   if(d<p.r+12){if(o.k==="coin"){G.coins+=Math.ceil(1*S.coin);sfx("coin")}if(o.k==="pizza"){p.hp=Math.min(p.maxHp,p.hp+30);txt(p.x,p.y-24,"+30 🍕","#4ade80")}
    if(o.k==="magnet"){ent.gem.forEach(g=>g.pull=true);txt(p.x,p.y-24,"MAGNET!","#60a5fa")}if(o.k==="chest"){sfx("lvl");openCards(true)}release("item",ent.item,i);continue}
   if(o.l<=0&&o.k!=="chest")release("item",ent.item,i)}
- if(G.xp>=G.xpN&&state==="play"){G.xp-=G.xpN;G.lvl++;G.xpN=Math.floor(6+G.lvl*4+Math.pow(G.lvl,1.6));sfx("lvl");parts(p.x,p.y,20,"#facc15",200);openCards(false)}}
+ if(G.xp>=G.xpN&&state==="play"){G.xp-=G.xpN;G.lvl++;G.xpN=Math.floor(3+G.lvl*3+Math.pow(G.lvl,1.55));sfx("lvl");parts(p.x,p.y,20,"#facc15",200);openCards(false)}}
 function options(){const o=[];
  for(const k of G.order){const w=G.w[k];if(!w.evo&&w.lv>=5&&G.ps[W8[k].evo])o.push({t:"evo",k,pri:1})}
  for(const k of G.order)if(G.w[k].lv<5)o.push({t:"w",k});
@@ -404,4 +405,4 @@ $("topB").onclick=()=>{$("boardTitle").textContent="🏆 Top 10 — "+DIFF[save.
 
 buildSprites();goTitle();requestAnimationFrame(loop);
 // test hooks
-window.__rs={prog,get G(){return G},get state(){return state},ent,save:()=>save,options,choose,spawnZ,openCards,endRun,stat,fps:()=>fps};
+window.__rs={nearest,prog,get G(){return G},get state(){return state},ent,save:()=>save,options,choose,spawnZ,openCards,endRun,stat,fps:()=>fps};
