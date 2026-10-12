@@ -2,3 +2,4 @@ test.py
 __pycache__
 playtest.py
 killpaths.py
+endless_ap.py
