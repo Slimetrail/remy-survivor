@@ -380,12 +380,15 @@ function renderShop(){$("shopCoins").textContent="🪙 "+save.coins+" coins";con
  b.textContent=lv>=s.m?"MAX":"🪙 "+cost;b.disabled=lv>=s.m||save.coins<cost;b.onclick=()=>{save.coins-=cost;save.shop[k]=lv+1;persist();sfx("coin");renderShop()};d.appendChild(b);l.appendChild(d)}}
 $("heroB").onclick=()=>{renderHeroes();show("heroes")};$("heroBack").onclick=goTitle;$("shopB").onclick=()=>{renderShop();show("shop")};$("shopBack").onclick=goTitle;
 
+function nextDadNote(){const N=window.DAD_NOTES||[];if(!N.length)return"";let bag=LS.get("dadbag",[]).filter(i=>i<N.length);if(!bag.length){bag=N.map((_,i)=>i);for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]]}const lastN=LS.get("dadlast",-1);if(bag.length>1&&bag[bag.length-1]===lastN)[bag[0],bag[bag.length-1]]=[bag[bag.length-1],bag[0]]}
+ const i=bag.pop();LS.set("dadbag",bag);LS.set("dadlast",i);return N[i]}
 // end of run & board
 let pendingScore=null;
 function score(){return Math.floor(G.t)*10+G.kills*2+G.lvl*50}
 function endRun(won,quit){if(state==="over")return;state="over";$("pauseB").classList.add("hidden");const earned=Math.round((G.coins+Math.floor(G.kills/15*stat().coin)+(won?50+G.stage*20:0))*DF().coin);save.coins+=earned;
  let finale=false;if(won&&G.mode==="journey"){if(!prog().cleared.includes(G.stage))prog().cleared.push(G.stage);if(G.stage===LAST)finale=true;else prog().stage=Math.max(prog().stage,G.stage+1)}persist();
  const mm=Math.floor(G.t/60),ss=String(Math.floor(G.t%60)).padStart(2,"0");const sc=score();
+ const dn=$("dadNote");if(!won&&!quit){const n=nextDadNote();if(n){dn.innerHTML='<div class="dadT">💌 A note from Dad</div><div class="dadB"></div><div class="dadS">— Dad</div>';dn.querySelector(".dadB").textContent=n;dn.classList.remove("hidden")}else dn.classList.add("hidden")}else dn.classList.add("hidden");
  $("overT").textContent=won?"STAGE CLEARED! 🎉":quit?"Run abandoned 🏳️":pick(["GOO'D GAME 💀","YOU GOT NOMMED 🧟","BRAAAINS... yours. 🧠"]);
  $("overSub").textContent=won?(finale?"You made it HOME!":"Next stop: "+STAGES[G.stage+1].n):pick(["The zombies say thanks for the snack.","Grandpa believes in you. Try again!","Leo is still waiting! Get back out there."]);
  $("res").innerHTML=`⏱ Survived <b>${mm}:${ss}</b><br>💀 Zombies gooed: <b>${G.kills}</b><br>⭐ Level: <b>${G.lvl}</b><br>🏆 Score: <b>${sc}</b><br>🪙 Coins earned: <b>+${earned}</b>`;
