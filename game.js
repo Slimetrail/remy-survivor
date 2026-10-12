@@ -147,13 +147,13 @@ function buildSprites(){
 // ===== Spawning =====
 function spawnZ(type,x,y,boss){const z=obtain("z"),T=ZT[type];const sc=G.mode==="journey"?G.diff:1,tm=1+G.t/100;
  const D=DF();Object.assign(z,{type,x,y,r:T.r,hp:T.hp*tm*sc*D.hp*(boss?1+G.bossN*.6:1),spd:T.spd*rnd(.9,1.1)*(type==="boss"?1:Math.min(1.5,1+G.t/900))*D.spd,dmg:T.dmg*(1+G.t/400)*D.dmg,xp:T.xp,flash:0,kx:0,ky:0,slow:0,wob:Math.random()*6,dash:0,dashCd:3,name:boss||""});
- z.max=z.hp;z.hit=z.hit||{};for(const k in z.hit)z.hit[k]=0;ent.z.push(z);return z}
+ z.stageBoss=false;if(boss&&G.mode==="journey"&&!G.stageBossSpawned){z.stageBoss=true;G.stageBossSpawned=true;G.stageBossName=boss}z.max=z.hp;z.hit=z.hit||{};for(const k in z.hit)z.hit[k]=0;ent.z.push(z);return z}
 function edgePt(m=30){const p=G.p,hw=W/2+m,hh=H/2+m,per=2*(hw+hh),r=Math.random()*per;let x,y;if(r<2*hw){x=r-hw;y=Math.random()<.5?-hh:hh}else{y=r-2*hw-hh;x=Math.random()<.5?-hw:hw}return[p.x+x,p.y+y]}
 function waves(){const t=G.t,p=G.p;G.waveI=G.waveI||0;
  if(G.waveI===0&&t>1.2){G.waveI=1;const n=30;for(let i=0;i<n;i++){const a=i/n*Math.PI*2;spawnZ(i%5===0?"runner":"shamb",p.x+Math.cos(a)*(W/2+25),p.y+Math.sin(a)*(H/2+25))}G.banner="🧟 THEY'RE EVERYWHERE!";G.bannerT=2;sfx("boss");G.shake=6}
  if(G.waveI===1&&t>14){G.waveI=2;const[hx,hy]=edgePt();for(let i=0;i<14;i++)spawnZ("runner",hx+rnd(-40,40),hy+rnd(-40,40));G.banner="🏃 Runner pack!";G.bannerT=1.5}
  if(G.waveI===2&&t>32){G.waveI=3;const n=36;for(let i=0;i<n;i++){const a=i/n*Math.PI*2;spawnZ(i%6===0?"dog":"shamb",p.x+Math.cos(a)*(W/2+25),p.y+Math.sin(a)*(H/2+25))}G.banner="🧟 Surrounded!";G.bannerT=1.5}}
-function spawnTick(dt){const t=G.t;waves();if(G.bossAlive&&ent.z.length>120)return;
+function spawnTick(dt){if(G.won)return;const t=G.t;waves();if(G.bossAlive&&ent.z.length>120)return;
  const rate=(2.0+t/45)*(G.mode==="journey"?(G.stage<2?.62:.75)+G.stage*.09:1.1);G.spawnAcc+=dt*Math.min(rate*DF().sp,36);
  while(G.spawnAcc>=1&&ent.z.length<Math.min(330,90+t*.6)){G.spawnAcc--;
   const pool=Object.keys(ZT).filter(k=>ZT[k].t<=t+(G.mode==="journey"?G.stage*11:0));
@@ -161,7 +161,7 @@ function spawnTick(dt){const t=G.t;waves();if(G.bossAlive&&ent.z.length>120)retu
   if(Math.random()<.004*Math.min(1,t/60)){const[hx,hy]=edgePt();for(let i=0;i<10;i++)spawnZ(t>80?"dog":"runner",hx+rnd(-30,30),hy+rnd(-30,30))} // horde!
   const[ex,ey]=edgePt();spawnZ(type,ex,ey)}
  if(t>=G.nextBoss&&!G.bossAlive){const nm=G.mode==="journey"?STAGES[G.stage].boss:pick(["Big Gulp Gary","Principal Brains","Mega Mall Santa","Sir Moans-a-Lot","Grill Master Ghoul"]);
-  const a=Math.random()*7;G.bossAlive=spawnZ("boss",G.p.x+Math.cos(a)*380,G.p.y+Math.sin(a)*380,nm);G.bossN++;G.banner="⚠️ BOSS: "+nm;G.bannerT=3;sfx("boss");G.shake=12;
+  const a=Math.random()*7;G.bossAlive=spawnZ("boss",G.p.x+Math.cos(a)*380,G.p.y+Math.sin(a)*380,nm);G.bossN++;G.banner=(G.mode==="journey"?"⚠️ STAGE BOSS: ":"⚠️ BOSS: ")+nm;G.bannerT=3;sfx("boss");G.shake=12;
   G.nextBoss=G.mode==="journey"?1e9:G.t+150}}
 
 // ===== Damage =====
@@ -178,12 +178,14 @@ function killZ(z){G.kills++;const col=z.type==="clown"?"#f472b6":z.type==="bloat
  if(z.type==="bloat"){sfx("splat");parts(z.x,z.y,18,"#a78bfa",220);const zn=zone(z.x,z.y,55,1.2,0,"goo");G.shake=Math.max(G.shake,4);
   if(Math.hypot(G.p.x-z.x,G.p.y-z.y)<60)hitPlayer(8);setTimeout(()=>{if(G)aoe(z.x,z.y,60,25,"burst",60)},0)}
  if(z.type==="boss"){G.bossAlive=null;G.shake=20;sfx("boom");for(let i=0;i<12;i++)item(z.x+rnd(-50,50),z.y+rnd(-50,50),"coin");item(z.x,z.y,"chest");ent.item[ent.item.length-1].pull=true;ent.gem.forEach(g=>g.pull=true);txt(z.x,z.y-50,"BOSS DEFEATED!","#facc15");
-  if(G.mode==="journey"){G.won=true;G.wonT=2.2;G.banner="🎉 "+STAGES[G.stage].n+" CLEARED!";G.bannerT=3;sfx("win")}}
+  if(z.stageBoss)stageClear()}
  z.hp=0}
+function stageClear(){if(!G||G.mode!=="journey"||G.won)return;G.won=true;G.wonT=2.2;G.p.inv=1e9;G.p.hp=Math.max(G.p.hp,1);G.banner="🎉 "+STAGES[G.stage].n+" CLEARED!";G.bannerT=3;sfx("win");
+ for(const z of ent.z){if(z.hp>0&&!z.stageBoss){parts(z.x,z.y,4,"#84cc16");z.hp=0}}}
 function dropGem(x,y,v){if(ent.gem.length>400){const g=ent.gem[Math.floor(Math.random()*ent.gem.length)];g.v+=v;return}const g=obtain("gem");Object.assign(g,{x,y,v,pull:false});ent.gem.push(g)}
 function item(x,y,k){const o=obtain("item");Object.assign(o,{x,y,k,l:30,pull:false});ent.item.push(o)}
 function zone(x,y,r,l,dmg,k,slow=0){const o=obtain("zone");Object.assign(o,{x,y,r,l,ml:l,dmg,k,slow});ent.zone.push(o);return o}
-function hitPlayer(d){const p=G.p;if(p.inv>0)return;d=Math.max(1,d-p.armor);p.hp-=d;p.inv=.5;for(const z of ent.z){if(z.hp>0&&z.type!=="boss"){const dx=z.x-p.x,dy=z.y-p.y,dd=dx*dx+dy*dy;if(dd<70*70){const l=Math.sqrt(dd)||1;z.kx+=dx/l*90;z.ky+=dy/l*90}}}G.shake=Math.max(G.shake,6);sfx("hurt");txt(p.x,p.y-20,"-"+Math.round(d),"#f87171");
+function hitPlayer(d){const p=G.p;if(p.inv>0||G.won)return;d=Math.max(1,d-p.armor);p.hp-=d;p.inv=.5;for(const z of ent.z){if(z.hp>0&&z.type!=="boss"){const dx=z.x-p.x,dy=z.y-p.y,dd=dx*dx+dy*dy;if(dd<70*70){const l=Math.sqrt(dd)||1;z.kx+=dx/l*90;z.ky+=dy/l*90}}}G.shake=Math.max(G.shake,6);sfx("hurt");txt(p.x,p.y-20,"-"+Math.round(d),"#f87171");
  if(p.hp<=0){if(G.revive){G.revive=false;p.hp=p.maxHp*.5;p.inv=2;G.banner="🧃 Juice box revive!";G.bannerT=2;aoe(p.x,p.y,250,999,"rev",200)}else endRun(false)}}
 function nearestN(x,y,n,maxD=900){const out=[];for(const z of ent.z){if(z.hp<=0)continue;const d=(z.x-x)**2+(z.y-y)**2;if(d>maxD*maxD)continue;out.push([d,z])}out.sort((a,b)=>a[0]-b[0]);return out.slice(0,n).map(o=>o[1])}
 function nearest(x,y,maxD=1e9){let b=null,bd=maxD*maxD;for(const z of ent.z){if(z.hp<=0)continue;const d=(z.x-x)**2+(z.y-y)**2;if(d<bd){bd=d;b=z}}return b}
@@ -284,6 +286,7 @@ function step(dt){const p=G.p,S=stat();G.t+=dt;
  for(let i=ent.part.length-1;i>=0;i--){const o=ent.part[i];o.l-=dt;o.x+=o.vx*dt;o.y+=o.vy*dt;o.vx*=.9;o.vy*=.9;if(o.l<=0)release("part",ent.part,i)}
  for(let i=ent.txt.length-1;i>=0;i--){const o=ent.txt[i];o.l-=dt;o.y-=40*dt;if(o.l<=0)release("txt",ent.txt,i)}
  G.shake*=.88;G.bannerT-=dt;
+ if(G.mode==="journey"&&G.stageBossSpawned&&!G.won&&!ent.z.some(z=>z.stageBoss&&z.hp>0))stageClear();
  if(G.won&&state==="play"){G.wonT-=dt;if(G.wonT<=0&&!ent.item.some(o=>o.k==="chest"))endRun(true)}}
 function loop(now){let dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;fps=fps*.95+(1/Math.max(dt,.001))*.05;
  if(state==="play"&&G){const n=window.__speed||1;for(let i=0;i<n;i++)step(dt)}if(G&&(state!=="title"))draw();requestAnimationFrame(loop)}
@@ -326,8 +329,10 @@ function hud(){const p=G.p,top=0;cx.fillStyle="#0009";cx.fillRect(0,top,W,28);cx
  cx.fillText("Lv "+G.lvl,8,top+11);cx.textAlign="center";cx.fillText("⏱ "+mm+":"+ss,W/2,top+11);cx.textAlign="right";cx.fillText("💀 "+G.kills+"  🪙 "+G.coins,W-8,top+11);
  cx.fillStyle="#0009";cx.fillRect(8,36,150,14);cx.fillStyle=p.hp/p.maxHp<.3?"#ef4444":"#4ade80";cx.fillRect(10,38,146*Math.max(0,p.hp/p.maxHp),10);cx.font="bold 11px system-ui";cx.textAlign="left";cx.fillStyle="#fff";cx.fillText("❤ "+Math.ceil(Math.max(0,p.hp))+"/"+p.maxHp,14,43);
  let x=8;cx.font="16px serif";for(const k of G.order){cx.fillText(G.w[k].evo?W8[k].ei:W8[k].i,x,64);x+=22}x=8;cx.font="13px serif";for(const k in G.ps){cx.fillText(PS[k].i,x,84);x+=18}
- if(G.mode==="journey"&&!G.bossAlive&&!G.won){const left=Math.max(0,G.nextBoss-G.t);cx.textAlign="center";cx.font="bold 13px system-ui";cx.fillStyle="#fde68a";cx.fillText("📍 "+STAGES[G.stage].n+" — boss in "+Math.floor(left/60)+":"+String(Math.floor(left%60)).padStart(2,"0"),W/2,H-22)}
- if(G.bossAlive){const b=G.bossAlive;cx.fillStyle="#000a";cx.fillRect(W*.15,96,W*.7,14);cx.fillStyle="#dc2626";cx.fillRect(W*.15+2,98,(W*.7-4)*Math.max(0,b.hp/b.max),10);cx.font="bold 11px system-ui";cx.textAlign="center";cx.fillStyle="#fff";cx.fillText("👑 "+b.name,W/2,103)}
+ if(G.mode==="journey"&&!G.bossAlive&&!G.won){const left=Math.max(0,G.nextBoss-G.t);cx.textAlign="center";cx.font="bold 13px system-ui";cx.fillStyle="#fde68a";cx.font="bold 15px system-ui";cx.lineWidth=4;cx.lineJoin="round";cx.strokeStyle="#000";const bl="📍 "+STAGES[G.stage].n+" — STAGE BOSS in "+Math.floor(left/60)+":"+String(Math.floor(left%60)).padStart(2,"0");cx.strokeText(bl,W/2,H-22);cx.fillText("📍 "+STAGES[G.stage].n+" — STAGE BOSS in "+Math.floor(left/60)+":"+String(Math.floor(left%60)).padStart(2,"0"),W/2,H-22)}
+ if(G.mode==="endless"){const left=Math.max(0,G.nextBoss-G.t);cx.textAlign="center";cx.font="900 15px system-ui";cx.lineWidth=4;cx.lineJoin="round";cx.strokeStyle="#000";const el="♾️ ENDLESS MODE — "+(G.bossAlive?"boss fight!":"next boss in "+Math.floor(left/60)+":"+String(Math.floor(left%60)).padStart(2,"0"));cx.strokeText(el,W/2,H-22);cx.fillStyle="#c4b5fd";cx.fillText(el,W/2,H-22)}
+ if(G.mode==="journey"&&G.bossAlive&&G.bossAlive.stageBoss&&!G.won){cx.textAlign="center";cx.font="bold 14px system-ui";cx.lineWidth=4;cx.strokeStyle="#000";const tl="👑 Beat the STAGE BOSS to clear "+STAGES[G.stage].n.split(",")[0]+"!";cx.strokeText(tl,W/2,H-22);cx.fillStyle="#fca5a5";cx.fillText(tl,W/2,H-22)}
+ if(G.bossAlive){const b=G.bossAlive;cx.fillStyle="#000a";cx.fillRect(W*.15,96,W*.7,14);cx.fillStyle="#dc2626";cx.fillRect(W*.15+2,98,(W*.7-4)*Math.max(0,b.hp/b.max),10);cx.font="bold 11px system-ui";cx.textAlign="center";cx.fillStyle="#fff";cx.fillText((b.stageBoss?"👑 STAGE BOSS: ":"👑 BOSS: ")+b.name,W/2,103)}
  if(G.bannerT>0){cx.globalAlpha=Math.min(1,G.bannerT);cx.font="900 24px system-ui";cx.textAlign="center";cx.lineWidth=5;cx.lineJoin="round";cx.strokeStyle="#000";cx.strokeText(G.banner,W/2,H*.3);cx.fillStyle="#facc15";cx.fillText(G.banner,W/2,H*.3);cx.globalAlpha=1}}
 
 // ===== Screens =====
@@ -417,4 +422,4 @@ $("topB").onclick=()=>{$("boardTitle").textContent="🏆 Top 10 — "+DIFF[save.
 
 buildSprites();goTitle();requestAnimationFrame(loop);
 // test hooks
-window.__rs={setMute,get AC(){return AC},bagPick,nearest,prog,get G(){return G},get state(){return state},ent,save:()=>save,options,choose,spawnZ,openCards,endRun,stat,fps:()=>fps};
+window.__rs={stageClear,hurt,aoe,killZ,zone,setMute,get AC(){return AC},bagPick,nearest,prog,get G(){return G},get state(){return state},ent,save:()=>save,options,choose,spawnZ,openCards,endRun,stat,fps:()=>fps};

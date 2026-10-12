@@ -43,7 +43,7 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <div class="screen center" id="title"><div style="font-size:54px">🧟‍♂️🐔🍌</div><h1>Remy<br>Survivor</h1>
 <p>Fight your way home from Niceville, FL to Pamplico, SC with the silliest weapons ever invented.</p>
 <p id="coinS" class="card">🪙 0</p>
-<div id="diffRow" class="row"></div><p id="diffInfo" style="font-size:13px;opacity:.85"></p><button class="btn" id="journeyB">🗺️ Journey Home</button><button class="btn alt" id="endlessB">♾️ Endless Mode</button>
+<div id="diffRow" class="row"></div><p id="diffInfo" style="font-size:13px;opacity:.85"></p><button class="btn" id="journeyB" style="font-size:28px;padding:16px 34px;min-width:270px">🗺️ JOURNEY HOME ▶<br><small style="font-size:14px;font-weight:700">Story mode: beat each town's boss</small></button><button class="btn sm" id="endlessB" style="background:#6d28d9;color:#fff;box-shadow:0 4px 0 #3b0764">♾️ Endless Mode <small>(no story, bosses forever)</small></button>
 <div class="row"><button class="btn sm" id="heroB">🧑 Heroes</button><button class="btn sm" id="shopB">🛒 Shop</button><button class="btn sm" id="topB">🏆 Top 10</button><button class="btn sm" id="storyB">📖 Story</button></div>
 <button class="btn sm blue" id="installBtn">📲 Install app</button><div id="installHelp" class="card hidden">Tap Chrome's <b>⋮</b> menu → <b>Install app</b> / <b>Add to Home screen</b><br><small>(iPhone: Share ⬆️ → Add to Home Screen)</small><br><button class="btn sm" id="helpOk">OK</button></div>
 <button class="btn sm" id="muteB" style="background:#334155;color:#fff;box-shadow:0 4px 0 #0f172a;font-size:20px">🔊 Sound on</button></div>
@@ -57,8 +57,8 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <div id="ini" class="hidden"><p><b>🎉 Top 10! Pick your initials</b></p><div id="iniCols"></div><br><button class="btn" id="iniSave">✔ Save</button></div>
 <div id="overBoard"></div><div id="overBtns" style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn" id="againB">🔁 Again</button><button class="btn sm alt" id="homeB">🏠 Home</button></div></div>
 <div class="screen hidden" id="board"><h2 id="boardTitle">🏆 Top 10</h2><div id="boardList"></div><button class="btn sm" id="boardBack">⬅ Back</button></div>
-<script src="dadnotes.js?v=8"></script><script src="verses.js?v=8"></script><script src="game.js?v=8"></script>
-<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=8');
+<script src="dadnotes.js?v=9"></script><script src="verses.js?v=9"></script><script src="game.js?v=9"></script>
+<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=9');
 let deferredPrompt=null;const ib=document.getElementById("installBtn"),hp=document.getElementById("installHelp");
 const standalone=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||navigator.standalone;
 if(standalone())ib.classList.add("hidden");
