@@ -10,6 +10,7 @@ let save=LS.get("save",{coins:0,heroes:["remy"],hero:"remy",shop:{},stage:0,clea
 const persist=()=>LS.set("save",save);
 const DIFF={easy:{n:"🌱 Easy",hp:.7,dmg:.6,spd:.9,sp:.75,coin:1},medium:{n:"🌟 Medium",hp:1,dmg:1,spd:1,sp:1,coin:1.3},hard:{n:"🔥 Hard",hp:1.45,dmg:1.35,spd:1.1,sp:1.25,coin:1.7},brutal:{n:"💀 Brutal",hp:2.1,dmg:1.8,spd:1.2,sp:1.6,coin:2.5}};
 if(!save.diff)save.diff="medium";if(!save.prog)save.prog={};
+if((save.ver||1)<2){const M=[0,1,2,3,5,6,8,9];for(const k in save.prog){const p=save.prog[k],c=p.cleared.map(i=>M[i]);if(c.includes(5))c.push(4);if(c.includes(8))c.push(7);p.cleared=[...new Set(c)];p.stage=M[p.stage]??0}save.ver=2;LS.set("save",save)}
 function prog(){return save.prog[save.diff]||(save.prog[save.diff]={stage:0,cleared:[]})}
 const DF=()=>DIFF[(G&&G.df)||save.diff];
 
@@ -29,14 +30,18 @@ function sfx(n){if(save.mute||!AC)return;const now=performance.now();if(lastS[n]
 
 // ===== Data =====
 const STAGES=[
- {n:"Niceville, FL",s:"Grandpa's cul-de-sac",g:"#3f6b35",d:"#35602d",x:.08,y:.86,boss:"Coach Chompers",tm:150},
- {n:"Crestview / I-10",s:"Traffic jam of the undead",g:"#5b5f55",d:"#4f534a",x:.2,y:.74,boss:"Big Rig Randy",tm:170},
- {n:"Tallahassee, FL",s:"Campus of the Living Dead",g:"#4d7a3a",d:"#426b31",x:.36,y:.70,boss:"Professor Brainsworth",tm:180},
- {n:"Valdosta, GA",s:"Peach orchard panic",g:"#6b7d33",d:"#5d6e2b",x:.46,y:.56,boss:"The Peach Fuzz Monster",tm:190},
- {n:"Savannah, GA",s:"Haunted squares (extra haunted)",g:"#3e5e4a",d:"#344f3e",x:.64,y:.44,boss:"Captain Moss-beard",tm:200},
- {n:"Charleston, SC",s:"Rainbow Row rumble",g:"#4a6b6b",d:"#3f5c5c",x:.78,y:.32,boss:"Shrimp & Grits Goliath",tm:210},
- {n:"Florence, SC",s:"Interstate truck-stop terror",g:"#5a6e3d",d:"#4d5f34",x:.66,y:.18,boss:"Mega Mall Santa",tm:220},
- {n:"Pamplico, SC",s:"HOME. Mom, Dad & Leo are inside!",g:"#3b6e2c",d:"#325e25",x:.84,y:.08,boss:"The Mayor of Zombietown",tm:240}];
+ {n:"Niceville, FL",s:"Grandpa's cul-de-sac",g:"#3f6b35",d:"#35602d",x:.08,y:.88,boss:"Coach Chompers",tm:150,deco:"grave"},
+ {n:"Crestview / I-10",s:"Traffic jam of the undead",g:"#5b5f55",d:"#4f534a",x:.18,y:.79,boss:"Big Rig Randy",tm:160,deco:"road"},
+ {n:"Tallahassee, FL",s:"Campus of the Living Dead",g:"#4d7a3a",d:"#426b31",x:.32,y:.73,boss:"Professor Brainsworth",tm:170,deco:"grave"},
+ {n:"Valdosta, GA",s:"Peach orchard panic",g:"#6b7d33",d:"#5d6e2b",x:.44,y:.65,boss:"The Peach Fuzz Monster",tm:180,deco:"peach"},
+ {n:"Waycross, GA",s:"Okefenokee Swamp stomp",g:"#3a5a3a",d:"#2f4a30",x:.56,y:.58,boss:"Swamp Thang the Gator King",tm:190,deco:"swamp"},
+ {n:"Savannah, GA",s:"Haunted squares (extra haunted)",g:"#3e5e4a",d:"#344f3e",x:.68,y:.47,boss:"Captain Moss-beard",tm:200,deco:"grave"},
+ {n:"Charleston, SC",s:"Rainbow Row rumble",g:"#4a6b6b",d:"#3f5c5c",x:.82,y:.36,boss:"Shrimp & Grits Goliath",tm:210,deco:"rainbow"},
+ {n:"Kingstree, SC",s:"Tobacco barn throwdown",g:"#7a6a3a",d:"#6a5b30",x:.70,y:.25,boss:"The Burger King-stree",tm:220,deco:"barn"},
+ {n:"Florence, SC",s:"Interstate truck-stop terror",g:"#5a6e3d",d:"#4d5f34",x:.56,y:.16,boss:"Mega Mall Santa",tm:230,deco:"road"},
+ {n:"Pamplico, SC",s:"HOME. Mom, Dad & Leo are inside!",g:"#3b6e2c",d:"#325e25",x:.82,y:.07,boss:"The Mayor of Zombietown",tm:240,deco:"grave"}];
+const LAST=STAGES.length-1;
+[[0, 46, "center"], [0, -32, "center"], [28, 7, "left"], [-28, 7, "right"], [28, 7, "left"], [-32, 7, "right"], [-28, 7, "right"], [-28, 7, "right"], [-28, 7, "right"], [0, -34, "center"]].forEach((l,i)=>STAGES[i].lab=l);
 const W8={ // weapons
  chicken:{n:"Rubber Chicken Launcher",i:"🐔",d:"Fires squeaky chickens at the closest zombie.",f:"\"BAWK!\" — Grandpa's secret weapon.",evo:"spicy",en:"Rotisserie Rocket Rooster",ei:"🍗",ef:"Chickens now EXPLODE. Grandpa would be so proud."},
  banana:{n:"Banana Boomerang",i:"🍌",d:"Bananas swing out, smack everything, and come back.",f:"Potassium-powered justice.",evo:"sneakers",en:"Banana Split-nado",ei:"🍨",ef:"Six bananas. Zero chill."},
@@ -82,7 +87,7 @@ function shopLv(k){return save.shop[k]||0}
 function newRun(mode){const h=HEROES[save.hero];const st=mode==="journey"?prog().stage:-1;
  G={mode,stage:st,t:0,kills:0,lvl:1,xp:0,xpN:6,coins:0,shake:0,spawnAcc:0,bossN:0,bossAlive:null,nextBoss:st>=0?STAGES[st].tm:150,won:false,revive:shopLv("rev")>0,
   p:{x:0,y:0,r:14,hp:0,maxHp:h.hp+shopLv("hp")*10,spd:h.spd*(1+shopLv("spd")*.04),armor:h.armor||0,inv:0,face:1,dx:1,dy:0,walk:0},
-  w:{},ps:{},order:[],banner:null,bannerT:0,dmgMul:1+shopLv("dmg")*.06,magBase:1+shopLv("mag")*.15,hero:save.hero,diff:st>=0?1+st*.22:1,df:save.diff};
+  w:{},ps:{},order:[],banner:null,bannerT:0,dmgMul:1+shopLv("dmg")*.06,magBase:1+shopLv("mag")*.15,hero:save.hero,diff:st>=0?1+st*.17:1,df:save.diff};
  G.p.hp=G.p.maxHp;for(const k in ent)ent[k].length=0;addWeapon(h.w);
  G.banner=st>=0?"📍 "+STAGES[st].n:"♾️ Endless Mode";G.bannerT=3}
 function stat(){const p=G.ps,h=HEROES[G.hero];return{dmg:G.dmgMul*(1+.12*(p.spicy||0)),spd:1+.1*(p.sneakers||0),mag:70*G.magBase*(1+.35*(p.tinfoil||0)),regen:.5*(p.catfood||0),
@@ -128,17 +133,23 @@ function buildSprites(){
   g.fillStyle="#dc2626";g.beginPath();g.moveTo(c-8,c-2);g.lineTo(c,c-16);g.lineTo(c+8,c-2);g.closePath();g.fill();g.stroke();g.fillStyle="#000";g.fillRect(c-3,c-2,2,2);g.fillRect(c+1,c-2,2,2)});
  // ground tiles per stage
  STAGES.forEach((s,i)=>{const t=document.createElement("canvas");t.width=t.height=160;const g=t.getContext("2d");g.fillStyle=s.g;g.fillRect(0,0,160,160);g.fillStyle=s.d;for(let j=0;j<40;j++){g.fillRect(Math.random()*160,Math.random()*160,3,6)}
-  g.fillStyle="#0002";g.beginPath();g.arc(40,120,9,0,7);g.fill();if(i===1||i===6){g.fillStyle="#ddd8";g.fillRect(0,78,160,4);for(let x=0;x<160;x+=40)g.fillRect(x,40,20,3)}
-  if(i%2===0){g.fillStyle="#9ca3af";g.fillRect(110,30,14,18);g.beginPath();g.arc(117,30,7,Math.PI,0);g.fill();g.fillStyle="#0005";g.fillRect(114,34,6,2)}SPR["g"+i]=t})}
+  g.fillStyle="#0002";g.beginPath();g.arc(40,120,9,0,7);g.fill();const D=s.deco;
+  if(D==="road"){g.fillStyle="#ddd8";g.fillRect(0,78,160,4);for(let x=0;x<160;x+=40)g.fillRect(x,40,20,3)}
+  if(D==="grave"){g.fillStyle="#9ca3af";g.fillRect(110,30,14,18);g.beginPath();g.arc(117,30,7,Math.PI,0);g.fill();g.fillStyle="#0005";g.fillRect(114,34,6,2)}
+  if(D==="peach"){g.fillStyle="#fb923c";for(const[x,y]of[[30,30],[120,100],[70,140]]){g.beginPath();g.arc(x,y,6,0,7);g.fill()}g.fillStyle="#4d7c0f";g.fillRect(118,92,4,4)}
+  if(D==="swamp"){g.fillStyle="#1e3a3a";g.beginPath();g.ellipse(50,50,34,18,0,0,7);g.ellipse(125,125,24,13,0,0,7);g.fill();g.fillStyle="#65a30d";g.beginPath();g.arc(42,46,5,0,7);g.arc(60,55,4,0,7);g.fill();g.strokeStyle="#4b3621";g.lineWidth=3;g.beginPath();g.moveTo(130,20);g.lineTo(130,55);g.moveTo(130,30);g.lineTo(140,22);g.stroke()}
+  if(D==="rainbow"){["#f9a8d4","#fde68a","#a5f3fc","#bbf7d0"].forEach((c,j)=>{g.fillStyle=c+"55";g.fillRect(j*40,0,40,12)})}
+  if(D==="barn"){g.fillStyle="#991b1b";g.fillRect(100,30,34,24);g.beginPath();g.moveTo(96,30);g.lineTo(117,14);g.lineTo(138,30);g.fill();g.fillStyle="#fef3c7";g.fillRect(113,40,8,14);g.fillStyle="#d9b25a";g.fillRect(30,110,18,12)}
+  SPR["g"+i]=t})}
 
 // ===== Spawning =====
 function spawnZ(type,x,y,boss){const z=obtain("z"),T=ZT[type];const sc=G.mode==="journey"?G.diff:1,tm=1+G.t/100;
  const D=DF();Object.assign(z,{type,x,y,r:T.r,hp:T.hp*tm*sc*D.hp*(boss?1+G.bossN*.6:1),spd:T.spd*rnd(.9,1.1)*(type==="boss"?1:Math.min(1.5,1+G.t/900))*D.spd,dmg:T.dmg*(1+G.t/400)*D.dmg,xp:T.xp,flash:0,kx:0,ky:0,slow:0,wob:Math.random()*6,dash:0,dashCd:3,name:boss||""});
  z.max=z.hp;z.hit=z.hit||{};for(const k in z.hit)z.hit[k]=0;ent.z.push(z);return z}
 function spawnTick(dt){const t=G.t;if(G.bossAlive&&ent.z.length>120)return;
- const rate=(1.3+t/14)*(G.mode==="journey"?.85+G.stage*.08:1);G.spawnAcc+=dt*Math.min(rate*DF().sp,36);
+ const rate=(1.3+t/14)*(G.mode==="journey"?.85+G.stage*.062:1);G.spawnAcc+=dt*Math.min(rate*DF().sp,36);
  while(G.spawnAcc>=1&&ent.z.length<330){G.spawnAcc--;const a=Math.random()*7,d=Math.max(W,H)*.62+rnd(0,60);
-  const pool=Object.keys(ZT).filter(k=>ZT[k].t<=t+(G.mode==="journey"?G.stage*15:0));
+  const pool=Object.keys(ZT).filter(k=>ZT[k].t<=t+(G.mode==="journey"?G.stage*11:0));
   let type="shamb";const r=Math.random();if(r<.45)type="shamb";else type=pick(pool);
   if(Math.random()<.004*Math.min(1,t/60)){for(let i=0;i<10;i++)spawnZ(t>80?"dog":"runner",G.p.x+Math.cos(a)*d+rnd(-30,30),G.p.y+Math.sin(a)*d+rnd(-30,30))} // horde!
   spawnZ(type,G.p.x+Math.cos(a)*d,G.p.y+Math.sin(a)*d)}
@@ -309,7 +320,7 @@ function hud(){const p=G.p,top=0;cx.fillStyle="#0009";cx.fillRect(0,top,W,28);cx
  let x=8;cx.font="16px serif";for(const k of G.order){cx.fillText(G.w[k].evo?W8[k].ei:W8[k].i,x,64);x+=22}x=8;cx.font="13px serif";for(const k in G.ps){cx.fillText(PS[k].i,x,84);x+=18}
  if(G.mode==="journey"&&!G.bossAlive&&!G.won){const left=Math.max(0,G.nextBoss-G.t);cx.textAlign="center";cx.font="bold 13px system-ui";cx.fillStyle="#fde68a";cx.fillText("📍 "+STAGES[G.stage].n+" — boss in "+Math.floor(left/60)+":"+String(Math.floor(left%60)).padStart(2,"0"),W/2,H-22)}
  if(G.bossAlive){const b=G.bossAlive;cx.fillStyle="#000a";cx.fillRect(W*.15,96,W*.7,14);cx.fillStyle="#dc2626";cx.fillRect(W*.15+2,98,(W*.7-4)*Math.max(0,b.hp/b.max),10);cx.font="bold 11px system-ui";cx.textAlign="center";cx.fillStyle="#fff";cx.fillText("👑 "+b.name,W/2,103)}
- if(G.bannerT>0){cx.globalAlpha=Math.min(1,G.bannerT);cx.font="900 24px system-ui";cx.textAlign="center";cx.lineWidth=5;cx.strokeStyle="#000";cx.strokeText(G.banner,W/2,H*.3);cx.fillStyle="#facc15";cx.fillText(G.banner,W/2,H*.3);cx.globalAlpha=1}}
+ if(G.bannerT>0){cx.globalAlpha=Math.min(1,G.bannerT);cx.font="900 24px system-ui";cx.textAlign="center";cx.lineWidth=5;cx.lineJoin="round";cx.strokeStyle="#000";cx.strokeText(G.banner,W/2,H*.3);cx.fillStyle="#facc15";cx.fillText(G.banner,W/2,H*.3);cx.globalAlpha=1}}
 
 // ===== Screens =====
 const SCR=["title","comic","map","heroes","shop","lvl","paused","over","board"];
@@ -344,13 +355,13 @@ function drawMap(){const c=$("mapC"),g=c.getContext("2d"),w=c.width,h=c.height;g
  g.fillStyle="#7dd3fc";g.beginPath();g.moveTo(0,h);g.lineTo(w*.55,h);g.lineTo(w*.6,h*.82);g.lineTo(w*.75,h*.6);g.lineTo(w*.92,h*.4);g.lineTo(w,h*.3);g.lineTo(w,h);g.fill();
  g.font="bold 26px system-ui";g.fillStyle="#0369a1";g.fillText("Gulf of Mexico",30,h-30);g.fillText("Atlantic",w-140,h*.7);g.fillStyle="#a8a29e";g.font="bold 30px system-ui";g.fillText("FL",80,h*.7);g.fillText("GA",w*.38,h*.38);g.fillText("SC",w*.5,h*.12);
  g.setLineDash([14,10]);g.lineWidth=6;g.strokeStyle="#7c2d12";g.beginPath();STAGES.forEach((s,i)=>{const x=s.x*w,y=s.y*h;i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke();g.setLineDash([]);
- const cur=prog().stage;STAGES.forEach((s,i)=>{const x=s.x*w,y=s.y*h,done=prog().cleared.includes(i),open=i<=Math.min(7,maxOpen());g.fillStyle=done?"#22c55e":open?"#facc15":"#9ca3af";g.strokeStyle="#000";g.lineWidth=4;g.beginPath();g.arc(x,y,i===cur?26:19,0,7);g.fill();g.stroke();
-  g.fillStyle="#000";g.font="bold 20px system-ui";g.textAlign="center";g.fillText(done?"✓":open?(i+1):"🔒",x,y+7);g.font="bold 19px system-ui";g.fillStyle="#1c1917";const lx=Math.min(w-90,Math.max(90,x));g.fillText(s.n,lx,y+(i%2?-34:46))});
- g.textAlign="left";g.font="40px serif";const s=STAGES[cur];g.fillText(i7(),s.x*w-20,s.y*h-30)}
+ const cur=prog().stage;STAGES.forEach((s,i)=>{const x=s.x*w,y=s.y*h,done=prog().cleared.includes(i),open=i<=Math.min(LAST,maxOpen());g.fillStyle=done?"#22c55e":open?"#facc15":"#9ca3af";g.strokeStyle="#000";g.lineWidth=4;g.beginPath();g.arc(x,y,i===cur?26:19,0,7);g.fill();g.stroke();
+  g.fillStyle="#000";g.font="bold 20px system-ui";g.textAlign="center";g.fillText(done?"✓":open?(i+1):"🔒",x,y+7);g.font="bold 19px system-ui";g.fillStyle="#1c1917";g.textAlign=s.lab[2];g.fillText(s.n,x+s.lab[0],y+s.lab[1])});
+ g.textAlign="left";g.font="40px serif";const s=STAGES[cur];g.fillText(i7(),s.x*w+14,s.y*h-14)}
 const i7=()=>HEROES[save.hero].i;
 function maxOpen(){return prog().cleared.length?Math.max(...prog().cleared)+1:0}
-function openMap(){prog().stage=Math.min(prog().stage,maxOpen(),7);show("map");state="map";drawMap();const s=STAGES[prog().stage];
- $("mapInfo").innerHTML=`<b>Stage ${prog().stage+1}: ${s.n}</b><br>${s.s}<br>Survive ${Math.floor(s.tm/60)}:${String(s.tm%60).padStart(2,"0")} then beat <b>${s.boss}</b>!<br><small>Tap a town to choose. ${prog().cleared.length}/8 cleared.</small>`}
+function openMap(){prog().stage=Math.min(prog().stage,maxOpen(),LAST);show("map");state="map";drawMap();const s=STAGES[prog().stage];
+ $("mapInfo").innerHTML=`<b>Stage ${prog().stage+1}: ${s.n}</b><br>${s.s}<br>Survive ${Math.floor(s.tm/60)}:${String(s.tm%60).padStart(2,"0")} then beat <b>${s.boss}</b>!<br><small>Tap a town to choose. ${prog().cleared.length}/${STAGES.length} cleared.</small>`}
 $("mapC").onclick=e=>{const r=e.target.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;let b=-1,bd=.01;STAGES.forEach((s,i)=>{const d=(s.x-x)**2+(s.y-y)**2;if(d<bd){bd=d;b=i}});if(b>=0&&b<=maxOpen()){prog().stage=b;persist();sfx("boing");openMap()}};
 $("journeyB").onclick=()=>{ac();if(!save.seenIntro){comic(INTRO,()=>{save.seenIntro=true;persist();openMap()})}else openMap()};
 $("storyB").onclick=()=>{ac();comic(INTRO,()=>{save.seenIntro=true;persist();goTitle()})};
@@ -358,7 +369,7 @@ $("mapGo").onclick=()=>startRun("journey");$("mapBack").onclick=goTitle;$("endle
 $("muteB").onclick=()=>{save.mute=!save.mute;persist();ac();goTitle()};
 
 function renderDiff(){const r=$("diffRow");r.innerHTML="";for(const k in DIFF){const b=document.createElement("button");b.className="btn sm"+(save.diff===k?"":" dim");b.dataset.d=k;b.textContent=DIFF[k].n;b.onclick=()=>{save.diff=k;persist();sfx("boing");goTitle()};r.appendChild(b)}
- $("diffInfo").textContent="Coins x"+DIFF[save.diff].coin+" • Journey: "+prog().cleared.length+"/8 towns cleared"}
+ $("diffInfo").textContent="Coins x"+DIFF[save.diff].coin+" • Journey: "+prog().cleared.length+"/"+STAGES.length+" towns cleared"}
 // heroes & shop
 function renderHeroes(){const l=$("heroList");l.innerHTML="";for(const k in HEROES){const h=HEROES[k],own=save.heroes.includes(k);const d=document.createElement("div");d.className="hero"+(save.hero===k?" sel":"");
  d.innerHTML=`<div style="font-size:38px">${h.i}</div><div style="flex:1"><b style="color:#facc15">${h.n}</b><br><small>${h.d}<br>❤ ${h.hp} • 👟 ${h.spd} • starts with ${W8[h.w].i}</small></div>`;const b=document.createElement("button");b.className="btn sm"+(own?"":" alt");
@@ -372,7 +383,7 @@ $("heroB").onclick=()=>{renderHeroes();show("heroes")};$("heroBack").onclick=goT
 let pendingScore=null;
 function score(){return Math.floor(G.t)*10+G.kills*2+G.lvl*50}
 function endRun(won,quit){if(state==="over")return;state="over";$("pauseB").classList.add("hidden");const earned=Math.round((G.coins+Math.floor(G.kills/15*stat().coin)+(won?50+G.stage*20:0))*DF().coin);save.coins+=earned;
- let finale=false;if(won&&G.mode==="journey"){if(!prog().cleared.includes(G.stage))prog().cleared.push(G.stage);if(G.stage===7)finale=true;else prog().stage=Math.max(prog().stage,G.stage+1)}persist();
+ let finale=false;if(won&&G.mode==="journey"){if(!prog().cleared.includes(G.stage))prog().cleared.push(G.stage);if(G.stage===LAST)finale=true;else prog().stage=Math.max(prog().stage,G.stage+1)}persist();
  const mm=Math.floor(G.t/60),ss=String(Math.floor(G.t%60)).padStart(2,"0");const sc=score();
  $("overT").textContent=won?"STAGE CLEARED! 🎉":quit?"Run abandoned 🏳️":pick(["GOO'D GAME 💀","YOU GOT NOMMED 🧟","BRAAAINS... yours. 🧠"]);
  $("overSub").textContent=won?(finale?"You made it HOME!":"Next stop: "+STAGES[G.stage+1].n):pick(["The zombies say thanks for the snack.","Grandpa believes in you. Try again!","Leo is still waiting! Get back out there."]);
