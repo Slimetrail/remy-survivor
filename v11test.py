@@ -79,16 +79,16 @@ with sync_playwright() as p:
   SET="const G=__rs.G,p=G.p;__rs.ent.z.length=0;G.t=5;p.hp=p.maxHp=1e6;G.order.length=0;window.__botDir=()=>[0,0];"
   # boss charge telegraph
   E(SET+"window.__b=__rs.spawnZ('boss',p.x+300,p.y);G.bossAlive=__b;__b.dashCd=0;__b.atk=0;Math.__r=Math.random;Math.random=()=>.99");pg.wait_for_timeout(150)
-  a=E("[__b.atk,__b.x]");pg.wait_for_timeout(200);pg.screenshot(path=O+"boss-charge-telegraph.png");pg.wait_for_timeout(500);b2=E("[__b.atk,__b.x]");E("Math.random=Math.__r")
+  a=E("[__b.atk,__b.x]");pg.wait_for_timeout(200);pg.screenshot(path=O+"boss-charge-telegraph.png");pg.wait_for_timeout(750);b2=E("[__b.atk,__b.x]");E("Math.random=Math.__r")
   ok("boss: charge wind-up (atk1, stands still) then rush (atk2/3, moved toward player)",a[0]==1 and b2[0] in(2,3) and b2[1]<a[1]-60,(a,b2))
   E(SET+"window.__b=__rs.spawnZ('boss',p.x+120,p.y);G.bossAlive=__b;__b.dashCd=0;__b.atk=0;Math.__r=Math.random;Math.random=()=>.1;p.inv=0");pg.wait_for_timeout(120);E("Math.random=Math.__r")
   s1=E("__b.atk");pg.wait_for_timeout(400);pg.screenshot(path=O+"boss-slam-telegraph.png");hp0=E("p=__rs.G.p;p.inv=0;p.hp");pg.wait_for_timeout(650);pg.screenshot(path=O+"boss-slam-shockwave.png");pg.wait_for_timeout(600)
   ok("boss: slam telegraph then shockwave hits player in ring",s1==4 and E("__rs.G.p.hp")<hp0,(s1,hp0,E("__rs.G.p.hp")))
   # charger
-  E(SET+"window.__c=__rs.spawnZ('charger',p.x+220,p.y);__c.dashCd=0");pg.wait_for_timeout(250);c1=E("[__c.dash>0,__c.x]");pg.wait_for_timeout(700);c2=E("__c.x")
+  E(SET+"window.__c=__rs.spawnZ('charger',p.x+220,p.y);__c.dashCd=0");pg.wait_for_timeout(250);c1=E("[__c.dash>0,__c.x]");pg.screenshot(path=O+"charger-rush-telegraph.png");pg.wait_for_timeout(350);pg.screenshot(path=O+"charger-rushing.png");pg.wait_for_timeout(350);c2=E("__c.x")
   ok("charger: telegraph then straight rush",c1[0] and c2<c1[1]-100,(c1,c2))
   # grabber
-  E(SET+"window.__g=__rs.spawnZ('grabber',p.x+5,p.y);__g.spd=0;p.inv=0");pg.wait_for_timeout(100);st1=E("__rs.G.p.stun");E("window.__botDir=()=>[1,0]");x0=E("__rs.G.p.x");pg.wait_for_timeout(300);x1=E("__rs.G.p.x")
+  E(SET+"window.__g=__rs.spawnZ('grabber',p.x+5,p.y);__g.spd=0;p.inv=0");pg.wait_for_timeout(100);st1=E("__rs.G.p.stun");pg.screenshot(path=O+"grabber-holding-player.png");E("window.__botDir=()=>[1,0]");x0=E("__rs.G.p.x");pg.wait_for_timeout(300);x1=E("__rs.G.p.x")
   ok("grabber: grab stuns ~0.7s (no movement)",st1>0.4 and abs(x1-x0)<3,(st1,x0,x1))
   E("__g.x=__rs.G.p.x+5;__g.y=__rs.G.p.y;__rs.G.p.inv=0;__rs.G.p.stun=0");pg.wait_for_timeout(150);ok("grabber: 2s cooldown, no chain grab",E("__rs.G.p.stun")<=0)
   # spewer vomit -> infest; edge spawns
@@ -117,7 +117,7 @@ with sync_playwright() as p:
   E(SET+"for(let i=0;i<3;i++){const t=__rs.spawnZ('tank',p.x+60+i*50,p.y-20+i*30);t.spd=0}const b=__rs.spawnZ('boss',p.x-140,p.y);b.spd=0;b.dashCd=99;");pg.wait_for_timeout(400);pg.screenshot(path=O+"boss-and-tanks-915.png")
   # offline
   pg.goto("http://localhost:8826/");pg.wait_for_timeout(1500);E("navigator.serviceWorker.ready");pg.wait_for_timeout(800);keys=E("caches.keys()");ctx.set_offline(True);pg.reload();pg.wait_for_timeout(800)
-  ok("offline: loads from SW cache remysurv-v11","remysurv-v11" in keys and E("typeof TOWNS!=='undefined'&&typeof __rs!=='undefined'"),keys);ctx.set_offline(False)
+  ok("offline: loads from SW cache remysurv-v12","remysurv-v12" in keys and E("typeof TOWNS!=='undefined'&&typeof __rs!=='undefined'"),keys);ctx.set_offline(False)
   print("errors",errs);ok("no console errors",not errs)
   b.close()
 srv.kill();print(sum(R),"/",len(R))

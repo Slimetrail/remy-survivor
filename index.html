@@ -45,6 +45,12 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 .dadT{font-size:13px;font-weight:800;color:#b45309;margin-bottom:4px}.dadB{font-size:17px;line-height:1.4;font-family:Georgia,serif}.dadS{text-align:right;font-style:italic;margin-top:6px;font-family:Georgia,serif}
 #verseCard{background:linear-gradient(#e9d5a1,#f5e6c4 12%,#f5e6c4 88%,#e9d5a1);color:#3f2a12;border-radius:6px;padding:14px 18px;max-width:340px;width:90%;box-sizing:border-box;text-align:center;border-top:7px solid #8b5a2b;border-bottom:7px solid #8b5a2b;box-shadow:0 4px 10px #0008;flex-shrink:0}
 .vT{font-size:13px;font-weight:800;color:#7c2d12;margin-bottom:6px}.vB{font-size:16px;line-height:1.45;font-family:Georgia,serif;font-style:italic}.vR{margin-top:8px;font-size:13px;font-weight:700;font-family:Georgia,serif}
+.cscene{overflow:hidden;line-height:0;max-width:none}.cscene .beat{position:absolute;inset:0;opacity:0;transition:opacity .6s}.cscene .beat.on{opacity:1}.cscene .beat canvas{display:block;transform-origin:50% 60%}
+.cscene .beat.on.fx-zoom canvas{animation:fz var(--d) linear forwards}@keyframes fz{from{transform:scale(1)}to{transform:scale(1.15)}}
+.cscene .beat.on.fx-pan canvas{animation:fp var(--d) ease-in-out forwards}@keyframes fp{from{transform:translateX(0)}to{transform:translateX(calc(-100% + var(--vw,100%)))}}
+.cscene .ov{position:absolute;inset:0;pointer-events:none}.cscene .fx-flick .ov{background:rgba(120,110,220,.18);animation:fk 1.9s steps(1) infinite}@keyframes fk{0%{opacity:1}8%{opacity:.1}12%{opacity:1}55%{opacity:.6}58%{opacity:0}62%{opacity:1}}
+.cscene .beat.on.fx-shadow .ov{background:linear-gradient(90deg,transparent 0,rgba(0,0,0,.75) 6%,rgba(0,0,0,.75) 22%,transparent 28%);background-size:200% 100%;animation:fsh var(--d) linear forwards}@keyframes fsh{from{background-position:120% 0}to{background-position:-30% 0}}
+.cscene .cbub,.cscene .cap{z-index:2;line-height:1.3}
 </style></head><body>
 <canvas id="c"></canvas>
 <button id="pauseB" class="hidden" aria-label="Pause">⏸</button><button id="muteHud" class="hidden" aria-label="Sound on">🔊</button>
@@ -65,8 +71,8 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <div id="ini" class="hidden"><p><b>🎉 Top 10! Pick your initials</b></p><div id="iniCols"></div><br><button class="btn" id="iniSave">✔ Save</button></div>
 <div id="overBoard"></div><div id="overBtns" style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn" id="againB">🔁 Again</button><button class="btn sm alt" id="homeB">🏠 Home</button></div></div>
 <div class="screen hidden" id="board"><h2 id="boardTitle">🏆 Top 10</h2><div id="boardList"></div><button class="btn sm" id="boardBack">⬅ Back</button></div>
-<script src="dadnotes.js?v=11"></script><script src="verses.js?v=11"></script><script src="towns-data.js?v=11"></script><script src="game.js?v=11"></script>
-<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=11');
+<script src="dadnotes.js?v=12"></script><script src="verses.js?v=12"></script><script src="towns-data.js?v=12"></script><script src="cutscene-lines.js?v=12"></script><script src="game.js?v=12"></script>
+<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=12');
 let deferredPrompt=null;const ib=document.getElementById("installBtn"),hp=document.getElementById("installHelp");
 const standalone=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||navigator.standalone;
 if(standalone())ib.classList.add("hidden");
