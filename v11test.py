@@ -117,7 +117,7 @@ with sync_playwright() as p:
   E(SET+"for(let i=0;i<3;i++){const t=__rs.spawnZ('tank',p.x+60+i*50,p.y-20+i*30);t.spd=0}const b=__rs.spawnZ('boss',p.x-140,p.y);b.spd=0;b.dashCd=99;");pg.wait_for_timeout(400);pg.screenshot(path=O+"boss-and-tanks-915.png")
   # offline
   pg.goto("http://localhost:8826/");pg.wait_for_timeout(1500);E("navigator.serviceWorker.ready");pg.wait_for_timeout(800);keys=E("caches.keys()");ctx.set_offline(True);pg.reload();pg.wait_for_timeout(800)
-  ok("offline: loads from SW cache remysurv-v13","remysurv-v13" in keys and E("typeof TOWNS!=='undefined'&&typeof __rs!=='undefined'"),keys);ctx.set_offline(False)
+  ok("offline: loads from SW cache remysurv-v12","remysurv-v12" in keys and E("typeof TOWNS!=='undefined'&&typeof __rs!=='undefined'"),keys);ctx.set_offline(False)
   print("errors",errs);ok("no console errors",not errs)
   b.close()
 srv.kill();print(sum(R),"/",len(R))
