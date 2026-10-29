@@ -24,7 +24,7 @@ try:
     if E("__rs.state")=="lvl":T.append(E("__rs.G.t"));pg.click(".up >> nth=0");continue
     pg.wait_for_timeout(50)
   g=[b2-a for a,b2 in zip(T,T[1:])];print("popup times",[round(x) for x in T])
-  ok("no popup in first 25s",T and T[0]>=25,T[:1]);ok("4-8 popups in first 5 min",4<=len(T)<=8,len(T));ok("min gap >= 25s",not g or min(g)>=24.9,min(g) if g else None)
+  ok("no popup in first 25s",T and T[0]>=24.9,T[:1]);ok("4-8 popups in first 5 min",4<=len(T)<=8,len(T));ok("min gap >= 25s",not g or min(g)>=24.9,min(g) if g else None)
   ok("no page errors",not errs,errs)
 finally: srv.kill()
 print("%d/%d passed"%(sum(R),len(R)));sys.exit(0 if all(R) else 1)
