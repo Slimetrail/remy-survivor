@@ -10,7 +10,9 @@ with sync_playwright() as p:
   pg.goto("http://localhost:8863/");E("localStorage.clear()");pg.reload();pg.wait_for_timeout(500)
   ids=E("CUT_LINES.map(x=>x.id)");want=E("[1,2,3,4,5,6,7,8,9].map(i=>townName(i).toLowerCase())")
   ok("cutscene-lines.js: 9 entries, one per transition, ids match towns",len(ids)==9 and len(set(ids))==9 and ids==want,(ids,want))
-  ok("all 9 lines are clearly-marked placeholders",E("CUT_LINES.every(x=>x.line==='[JEREMY LINE HERE]')"))
+  WANT={"crestview":"Finally! Some food. Oh no, Almond Joy!","tallahassee":"Wow, not much changed!","valdosta":"Lets play floor is lava","waycross":"Hi boy, you look like Gravy!","savannah":"This place was dead Before the Apocalypse.","charleston":"Remy!? If you hear this, we love you son!","kingstree":"Haha! Whats up slim.","florence":"Looks like someone put up a fight.","pamplico":"Hang in there, Mom and Dad. I'm almost home!"}
+  ok("all 9 lines are Jeremy's exact text",all(E("CUT_LINES.find(x=>x.id==='%s').line"%k)==v for k,v in WANT.items()))
+  E("__spoken.length=0;__rs.setMute(false)")
   ok("no invented goofy lines left in game.js",E("typeof CUTL")=="undefined")
   hashes=[];used=[]
   for i in range(1,10):
@@ -18,8 +20,9 @@ with sync_playwright() as p:
     cid=E("__cutId");used.append(cid);bub=pg.inner_text("#cut .cbub");txt=pg.inner_text("#cut")
     h=hashlib.md5(E("document.querySelector('#cut .beat canvas').toDataURL()").encode()).hexdigest();hashes.append(h)
     tot=E("__cutTotal");nb=E("__cutBeats");tier=E("__cutTier.id")
-    ok("scene %s: placeholder shows '...', no bracket tag, not spoken, %d beats, %d ms, tier %s"%(cid,nb,tot,tier),bub.strip()=="..." and "[" not in txt and "JEREMY" not in txt and E("__spoken.length")==0 and 10000<=tot<=15000 and tier==E("tier(TOWNS[%d].pop).id"%i),(bub,txt,tot))
-    pg.click("#cutS");pg.wait_for_timeout(250)
+    exp=("Radio" if cid=="charleston" else "Remy")+': "'+WANT[cid]+'"'
+    ok("scene %s: exact line in bubble (%s), voiced, %d beats, %d ms, tier %s"%(cid,exp[:12],nb,tot,tier),bub.strip()==exp and "[" not in txt and any(WANT[cid] in x for x in E("__spoken")) and 10000<=tot<=15000 and tier==E("tier(TOWNS[%d].pop).id"%i),(bub,txt,tot))
+    pg.click("#cutS");pg.wait_for_timeout(250);E("__spoken.length=0")
   ok("9 distinct cutscene ids",len(set(used))==9,used)
   ok("9 visually distinct first frames",len(set(hashes))==9)
   # beats advance on their own (cinematic sequence)
