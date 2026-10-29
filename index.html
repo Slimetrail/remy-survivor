@@ -32,7 +32,7 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 .cpanel .cap{position:absolute;left:6px;top:6px;line-height:1.2;background:#d8c98f;color:#1a1a1a;border:2px solid #0b0b0b;padding:3px 8px;font:900 13px system-ui;letter-spacing:.5px;text-transform:uppercase}
 .ctext{display:flex;flex-direction:column;gap:8px;max-width:480px;width:100%}.narr{background:#e8e0c8;color:#1d1b17;border:3px solid #0b0b0b;padding:8px 10px;font:600 15px/1.35 Georgia,serif;box-shadow:4px 4px 0 #000}
 .cpanel .bub{position:relative;background:#f5f1e6;color:#111;border:3px solid #0b0b0b;border-radius:18px;padding:8px 12px;font:800 15px/1.3 "Comic Sans MS","Trebuchet MS",system-ui;box-shadow:4px 4px 0 #000}.cpanel .bub:before{content:"";position:absolute;left:24px;top:-14px;border:7px solid transparent;border-bottom-color:#0b0b0b;border-left-color:#0b0b0b}
-.glow{position:absolute;inset:40% 0 10% 0;background:radial-gradient(ellipse at 50% 80%,rgba(255,130,40,.35),transparent 70%);animation:fl 1.7s ease-in-out infinite alternate;pointer-events:none}@keyframes fl{from{opacity:.35}to{opacity:1}}.cbub{position:absolute!important;left:30%;bottom:22%;max-width:60%;line-height:1.3}
+.glow{position:absolute;inset:40% 0 10% 0;background:radial-gradient(ellipse at 50% 80%,rgba(255,130,40,.35),transparent 70%);animation:fl 1.7s ease-in-out infinite alternate;pointer-events:none}@keyframes fl{from{opacity:.35}to{opacity:1}}.cbub{position:absolute!important;left:50%;top:8px;bottom:auto;transform:translateX(-50%);width:max-content;max-width:44%;text-align:center;line-height:1.3}.cscene .cbub:before{display:none}
 .cnum{opacity:.7;margin:4px 0}@keyframes trs{from{transform:translateX(40%);opacity:0}to{transform:none;opacity:1}}@keyframes trw{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}@keyframes trc{from{transform:scale(1.15) rotate(-1.5deg);opacity:0}to{transform:none;opacity:1}}
 .tr-slide{animation:trs .3s ease-out}.tr-wipe{animation:trw .35s ease-out}.tr-cut{animation:trc .25s ease-out}
 .panel{background:#fffbe6;color:#222;border:4px solid #000;border-radius:6px;box-shadow:6px 6px 0 #000;padding:12px;max-width:340px;width:90%;font-size:17px;text-align:left}
@@ -71,8 +71,8 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <div id="ini" class="hidden"><p><b>🎉 Top 10! Pick your initials</b></p><div id="iniCols"></div><br><button class="btn" id="iniSave">✔ Save</button></div>
 <div id="overBoard"></div><div id="overBtns" style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn" id="againB">🔁 Again</button><button class="btn sm alt" id="homeB">🏠 Home</button></div></div>
 <div class="screen hidden" id="board"><h2 id="boardTitle">🏆 Top 10</h2><div id="boardList"></div><button class="btn sm" id="boardBack">⬅ Back</button></div>
-<script src="dadnotes.js?v=13"></script><script src="verses.js?v=13"></script><script src="towns-data.js?v=13"></script><script src="cutscene-lines.js?v=13"></script><script src="game.js?v=13"></script>
-<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=13');
+<script src="dadnotes.js?v=14"></script><script src="verses.js?v=14"></script><script src="towns-data.js?v=14"></script><script src="cutscene-lines.js?v=14"></script><script src="game.js?v=14"></script>
+<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=14');
 let deferredPrompt=null;const ib=document.getElementById("installBtn"),hp=document.getElementById("installHelp");
 const standalone=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||navigator.standalone;
 if(standalone())ib.classList.add("hidden");
