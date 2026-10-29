@@ -93,7 +93,7 @@ let G=null,state="title";
 const ent={eb:[],z:[],b:[],gem:[],part:[],txt:[],zone:[],tur:[],beam:[],item:[]};
 function shopLv(k){return save.shop[k]||0}
 function newRun(mode){const h=HEROES[save.hero];const st=mode==="journey"?prog().stage:-1;
- G={mode,stage:st,t:0,kills:0,lvl:1,xp:0,xpN:3,coins:0,shake:0,spawnAcc:0,bossN:0,bossAlive:null,infT:0,cueT:0,burstN:0,burstAcc:0,edgeSide:1,infAcc:0,globs:[],nextBoss:st>=0?STAGES[st].tm:180,won:false,revive:shopLv("rev")>0,
+ G={mode,stage:st,t:0,kills:0,lvl:1,xp:0,xpN:22,lastPop:-99,coins:0,shake:0,spawnAcc:0,bossN:0,bossAlive:null,infT:0,cueT:0,burstN:0,burstAcc:0,edgeSide:1,infAcc:0,globs:[],nextBoss:st>=0?STAGES[st].tm:180,won:false,revive:shopLv("rev")>0,
   p:{x:0,y:0,r:14,hp:0,maxHp:h.hp+shopLv("hp")*10,spd:h.spd*(1+shopLv("spd")*.04),armor:h.armor||0,inv:0,face:1,dx:1,dy:0,walk:0},
   w:{},ps:{},order:[],banner:null,bannerT:0,dmgMul:1+shopLv("dmg")*.06,magBase:1+shopLv("mag")*.15,hero:save.hero,diff:st>=0?1+st*.17:1,df:save.diff};
  G.p.hp=G.p.maxHp;for(const k in ent)ent[k].length=0;addWeapon(h.w);
@@ -426,6 +426,7 @@ function zUpdate(dt){const p=G.p;grid.clear();
  for(const c of grid.values()){for(let a=0;a<c.length;a++)for(let b=a+1;b<c.length;b++){const A=c[a],B=c[b];let dx=B.x-A.x,dy=B.y-A.y;const d=Math.hypot(dx,dy)||.1,m=A.r+B.r;if(d<m){const push=(m-d)*.5/d;dx*=push;dy*=push;if(A.type!=="boss"){A.x-=dx;A.y-=dy}if(B.type!=="boss"){B.x+=dx;B.y+=dy}}}}}
 
 // ===== Pickups & leveling =====
+const LVL_GAP=25,xpNeed=l=>Math.floor(12+l*3+Math.pow(l,1.5));
 function pickups(dt){const p=G.p,S=stat(),M=S.mag;
  for(let i=ent.gem.length-1;i>=0;i--){const g=ent.gem[i];const dx=p.x-g.x,dy=p.y-g.y,d=Math.hypot(dx,dy);if(d<M||g.pull){g.pull=true;const v=Math.max(300,700-d);g.x+=dx/d*v*dt;g.y+=dy/d*v*dt}
   if(d<p.r+8){G.xp+=g.v;sfx("gem");release("gem",ent.gem,i)}}
@@ -433,7 +434,8 @@ function pickups(dt){const p=G.p,S=stat(),M=S.mag;
   if(d<p.r+12){if(o.k==="coin"){G.coins+=Math.ceil(1*S.coin);sfx("coin")}if(o.k==="pizza"){p.hp=Math.min(p.maxHp,p.hp+30);txt(p.x,p.y-24,"+30 🍕","#4ade80")}
    if(o.k==="magnet"){ent.gem.forEach(g=>g.pull=true);txt(p.x,p.y-24,"MAGNET!","#60a5fa")}if(o.k==="chest"){sfx("lvl");openCards(true)}release("item",ent.item,i);continue}
   if(o.l<=0&&o.k!=="chest")release("item",ent.item,i)}
- if(G.xp>=G.xpN&&state==="play"){G.xp-=G.xpN;G.lvl++;G.xpN=Math.floor(3+G.lvl*3+Math.pow(G.lvl,1.55));sfx("lvl");parts(p.x,p.y,20,"#facc15",200);openCards(false)}}
+ // level-up: gentler early curve + min LVL_GAP s between popups (extra xp waits, never lost)
+ if(G.xp>=G.xpN&&state==="play"&&G.t-G.lastPop>=LVL_GAP){G.lastPop=G.t;G.xp-=G.xpN;G.lvl++;G.xpN=xpNeed(G.lvl);sfx("lvl");parts(p.x,p.y,20,"#facc15",200);openCards(false)}}
 function options(){const o=[];
  for(const k of G.order){const w=G.w[k];if(!w.evo&&w.lv>=5&&G.ps[W8[k].evo])o.push({t:"evo",k,pri:1})}
  for(const k of G.order)if(G.w[k].lv<5)o.push({t:"w",k});
@@ -791,4 +793,4 @@ $("topB").onclick=()=>{$("boardTitle").textContent="🏆 Top 10 — "+DIFF[save.
 
 buildSprites();goTitle();requestAnimationFrame(loop);
 // test hooks
-window.__ZS=ZS;window.__GN=SPR.gnome;window.__HS=HS;window.__ATL=()=>ATL;window.__rs={ZT,INF,BOSSA,infest,get W(){return W},get H(){return H},endlessPow,stageClear,hurt,aoe,killZ,zone,setMute,get AC(){return AC},bagPick,nearest,prog,get G(){return G},get state(){return state},ent,save:()=>save,options,choose,spawnZ,openCards,endRun,stat,fps:()=>fps};
+window.__ZS=ZS;window.__GN=SPR.gnome;window.__HS=HS;window.__ATL=()=>ATL;window.__rs={ZT,LVL_GAP,xpNeed,INF,BOSSA,infest,get W(){return W},get H(){return H},endlessPow,stageClear,hurt,aoe,killZ,zone,setMute,get AC(){return AC},bagPick,nearest,prog,get G(){return G},get state(){return state},ent,save:()=>save,options,choose,spawnZ,openCards,endRun,stat,fps:()=>fps};
