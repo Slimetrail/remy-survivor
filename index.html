@@ -51,6 +51,10 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 .cscene .ov{position:absolute;inset:0;pointer-events:none}.cscene .fx-flick .ov{background:rgba(120,110,220,.18);animation:fk 1.9s steps(1) infinite}@keyframes fk{0%{opacity:1}8%{opacity:.1}12%{opacity:1}55%{opacity:.6}58%{opacity:0}62%{opacity:1}}
 .cscene .beat.on.fx-shadow .ov{background:linear-gradient(90deg,transparent 0,rgba(0,0,0,.75) 6%,rgba(0,0,0,.75) 22%,transparent 28%);background-size:200% 100%;animation:fsh var(--d) linear forwards}@keyframes fsh{from{background-position:120% 0}to{background-position:-30% 0}}
 .cscene .cbub,.cscene .cap{z-index:2;line-height:1.3}
+.cscene .cutHead{position:absolute;left:8px;right:8px;top:8px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none;max-height:calc(100% - 16px);box-sizing:border-box}
+.cscene .cutHead .cap{position:static;flex:0 0 auto}
+.cscene .cbub{position:static!important;left:auto;top:auto;transform:none;width:auto;max-width:100%;box-sizing:border-box;align-self:center;overflow-wrap:break-word}
+@media (min-width:800px) and (orientation:landscape){.cscene .cutHead{flex-direction:row;align-items:flex-start;gap:8px}.cscene .cbub{margin-left:auto;max-width:60%}}
 .cls{font-size:26px;font-weight:900;padding:18px 16px;border:0;border-radius:24px;min-width:280px;width:100%;max-width:340px;line-height:1.15}
 .cls small{display:block;font-size:15px;font-weight:800;margin-top:4px;opacity:.92}
 .cls.ranged{background:#a3e635;color:#1a2e05;box-shadow:0 6px 0 #3f6212}
@@ -61,7 +65,7 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <canvas id="c"></canvas>
 <button id="pauseB" class="hidden" aria-label="Pause">⏸</button><button id="muteHud" class="hidden" aria-label="Sound on">🔊</button>
 <div class="screen center" id="title"><div style="font-size:54px">🧟‍♂️🐔🍌</div><h1>Remy<br>Survivor</h1>
-<p>Fight your way home from Niceville, FL to Pamplico, SC with the silliest weapons ever invented.</p>
+<p>Your family needs you. Fight 450 miles home from Niceville, FL to Pamplico, SC with the silliest weapons ever invented.</p>
 <p id="coinS" class="card">🪙 0</p>
 <div id="diffRow" class="row"></div><p id="diffInfo" style="font-size:13px;opacity:.85"></p><button class="btn" id="journeyB" style="font-size:28px;padding:16px 34px;min-width:270px">🗺️ JOURNEY HOME ▶<br><small style="font-size:14px;font-weight:700">Story mode: beat each town's boss</small></button><button class="btn sm" id="endlessB" style="background:#6d28d9;color:#fff;box-shadow:0 4px 0 #3b0764">♾️ Endless Mode <small>(no story, bosses forever)</small></button>
 <div class="row"><button class="btn sm" id="heroB">🧑 Heroes</button><button class="btn sm" id="shopB">🛒 Shop</button><button class="btn sm" id="topB">🏆 Top 10</button><button class="btn sm" id="storyB">📖 Story</button></div>
@@ -82,8 +86,8 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <div id="ini" class="hidden"><p><b>🎉 Top 10! Pick your initials</b></p><div id="iniCols"></div><br><button class="btn" id="iniSave">✔ Save</button></div>
 <div id="overBoard"></div><div id="overBtns" style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn" id="againB">🔁 Again</button><button class="btn sm alt" id="homeB">🏠 Home</button></div></div>
 <div class="screen hidden" id="board"><h2 id="boardTitle">🏆 Top 10</h2><div id="boardList"></div><button class="btn sm" id="boardBack">⬅ Back</button></div>
-<script src="dadnotes.js?v=14"></script><script src="verses.js?v=14"></script><script src="towns-data.js?v=14"></script><script src="cutscene-lines.js?v=14"></script><script src="game.js?v=15"></script>
-<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=15');
+<script src="dadnotes.js?v=14"></script><script src="verses.js?v=14"></script><script src="towns-data.js?v=14"></script><script src="cutscene-lines.js?v=15"></script><script src="game.js?v=17"></script>
+<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=17');
 let deferredPrompt=null;const ib=document.getElementById("installBtn"),hp=document.getElementById("installHelp");
 const standalone=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||navigator.standalone;
 if(standalone())ib.classList.add("hidden");

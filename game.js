@@ -32,7 +32,7 @@ function sfx(n){if(save.mute||!AC)return;const now=performance.now();if(lastS[n]
 
 // ===== Data =====
 const STAGES=[
- {n:"Niceville, FL",s:"Granddad's cul-de-sac",g:"#3f6b35",d:"#35602d",x:.08,y:.88,boss:"Coach Chompers",tm:150,deco:"grave"},
+ {n:"Niceville, FL",s:"Granddad's cul-de-sac. Watch out for Bill.",g:"#3f6b35",d:"#35602d",x:.08,y:.88,boss:"Coach Chompers",tm:150,deco:"grave"},
  {n:"Crestview / I-10",s:"Traffic jam of the undead",g:"#5b5f55",d:"#4f534a",x:.18,y:.79,boss:"Big Rig Randy",tm:160,deco:"road"},
  {n:"Tallahassee, FL",s:"Campus of the Living Dead",g:"#4d7a3a",d:"#426b31",x:.32,y:.73,boss:"Professor Brainsworth",tm:170,deco:"grave"},
  {n:"Valdosta, GA",s:"Peach orchard panic",g:"#6b7d33",d:"#5d6e2b",x:.44,y:.65,boss:"The Peach Fuzz Monster",tm:180,deco:"peach"},
@@ -49,10 +49,10 @@ const W8={ // weapons
  banana:{n:"Banana Boomerang",i:"🍌",d:"Bananas swing out, smack everything, and come back.",f:"Potassium-powered justice.",evo:"sneakers",en:"Banana Split-nado",ei:"🍨",ef:"Six bananas. Zero chill."},
  whoopee:{n:"Whoopee Cushion Shockwave",i:"💨",d:"A toot blast knocks back nearby zombies.",f:"Excuse you. EXCUSE YOU.",evo:"disco",en:"Thunder Toot 3000",ei:"🌪️",ef:"Registered as a natural disaster in 3 states."},
  plunger:{n:"Spinning Toilet Plungers",i:"🪠",d:"Plungers orbit you, bonking zombies.",f:"Freshly used? Don't ask.",evo:"wrap",en:"Plunger-nado of Porcelain Doom",ei:"🚽",ef:"Brings a whole new meaning to 'flush them out'."},
- gnome:{n:"Garden Gnome Turret",i:"🍄",d:"Drops a grumpy gnome that pelts zombies with pebbles.",f:"He hates zombies. He hates you a little too.",evo:"coffee",en:"Gnome Depot Grand Opening",ei:"🏪",ef:"Gnomes on espresso. God help us all."},
+ gnome:{n:"Garden Gnome Turret",i:"🍄",d:"Drops a grumpy gnome that pelts zombies with pebbles.",f:"He hates zombies. He hates you a little too.",evo:"coffee",en:"Gnome Depot Grand Opening",ei:"🏪",ef:"Gnomes on espresso. Heaven help us all."},
  duck:{n:"Rubber Duck Mines",i:"🦆",d:"Leaves ducks behind that go KA-QUACK.",f:"Bath time is OVER.",evo:"sock",en:"Quackpocalypse Armada",ei:"🛁",ef:"Lucky ducks. Unlucky zombies."},
  pie:{n:"Pie Launcher",i:"🥧",d:"Lobs cream pies that splat an area and slow zombies.",f:"Comedy's oldest weapon.",evo:"catfood",en:"Grandma's Thanksgiving Pie-pocalypse",ei:"🎂",ef:"Every pie is a family recipe. The family is angry."},
- bubble:{n:"Bubble Wand",i:"🫧",d:"Floaty bubbles pop zombies and slow them down.",f:"So pretty. So deadly.",evo:"disco",en:"Bubble Trouble Foam Party",ei:"🪩",ef:"The undead now have to dance AND die."},
+ bubble:{n:"Bubble Wand",i:"🫧",d:"Floaty bubbles pop zombies and slow them down.",f:"So pretty. So deadly.",evo:"disco",en:"Bubble Trouble Foam Party",ei:"🪩",ef:"Zombies now have to dance AND get gooed."},
  kitty:{n:"Laser Kitty",i:"🐱",d:"A cat shoots eye lasers at zombies. Obviously.",f:"Pew pew, meow meow.",evo:"tinfoil",en:"Cosmic Meowtrix Prime",ei:"😼",ef:"The cat has contacted the mothership."},
  flip:{n:"Flaming Crocs",i:"🔥",d:"Spinning flaming Crocs that leave fire puddles.",f:"Granddad's Crocs. Sport mode. On fire.",evo:"spicy",en:"The Croc of Destiny",ei:"🔥",ef:"Strap locked in sport mode. Zombies fear the holes."},
  sack:{n:"Pillowcase of Apples",i:"🍎",d:"A swung sack that only hits zombies right around you.",f:"Granddad packed it for a picnic. The picnic had other plans.",evo:"disco",en:"Bushel Bash",ei:"🍏",ef:"A full-circle apple whirl. Lunch is cancelled."},
@@ -381,12 +381,12 @@ function zone(x,y,r,l,dmg,k,slow=0){const o=obtain("zone");Object.assign(o,{x,y,
 // boss: atk 1=charge wind-up (red lane shown), 2=rush, 3=recover/stagger; 4=slam wind-up (red ring), 5=shockwave expanding
 function bossAI(z,dt,dx,dy,d){const A=BOSSA,p=G.p;z.at=(z.at||0)-dt;z.atk=z.atk||0;
  if(!z.atk){z.dashCd-=dt;if(z.dashCd<=0){z.dashCd=A.cd;if(d<190&&Math.random()<.6){z.atk=4;z.at=A.slamWind;z.sx=z.x;z.sy=z.y}else{z.atk=1;z.at=A.wind;z.dvx=dx/d;z.dvy=dy/d}
-   txt(z.x,z.y-z.r-10,pick(["BRAAAINS!","HERE'S JOHNNY-BRAIN!","CHARGE!!","NOM TIME"]),"#f87171")}return}
+   txt(z.x,z.y-z.r-10,pick(["BRAAAINS!","SNACK ATTACK!","CHARGE!!","NOM TIME"]),"#f87171")}return}
  if(z.atk===2){z.x+=z.dvx*A.rushSpd*dt;z.y+=z.dvy*A.rushSpd*dt}
  if(z.atk===5){z.sr=(A.slamWind-z.at)*0+(z.sr||0)+A.slamSpd*dt;const pd=Math.hypot(p.x-z.sx,p.y-z.sy);if(!z.hitDone&&Math.abs(pd-z.sr)<16){z.hitDone=1;hitPlayer(A.slamDmg)}if(z.sr>=A.slamR){z.atk=3;z.at=.5}return}
  if(z.at<=0){if(z.atk===1){z.atk=2;z.at=A.rush;G.shake=Math.max(G.shake,4)}else if(z.atk===2){z.atk=3;z.at=A.recover}else if(z.atk===4){z.atk=5;z.sr=z.r;z.hitDone=0;G.shake=Math.max(G.shake,8);sfx("boom")}else z.atk=0}}
 // Spewer infest: 2x horde spawn (extras enter from left/right screen edges, alternating), horde 1.25x speed; timer refreshes, never stacks
-function infest(){if(!(G.infT>0)){G.burstN=INF.burst;G.burstAcc=0;G.cueT=1.2}G.infT=INF.dur;G.banner="🤢 INFESTED! The horde is coming";G.bannerT=1.5}
+function infest(){if(!(G.infT>0)){G.burstN=INF.burst;G.burstAcc=0;G.cueT=1.2}G.infT=INF.dur;G.banner="🤢 INFESTED! Horde incoming!";G.bannerT=1.5}
 function edgeSpawn(cap){if(ent.z.length>=cap)return null;G.edgeSide=-G.edgeSide;const p=G.p,z=spawnZ("shamb",p.x+G.edgeSide*(W/2+20+Math.random()*25),p.y+rnd(-H/2+20,H/2-20));z.edge=1;z.ex0=z.x-p.x;return z}
 function spewerGlob(x,y){const o=(pools.glob&&pools.glob.pop())||{};o.x=x;o.y=y;o.l=INF.globL;G.globs.push(o)}
 function hitPlayer(d){const p=G.p;if(p.inv>0||G.won)return;d=Math.max(1,d-p.armor);p.hp-=d;p.inv=.5;for(const z of ent.z){if(z.hp>0&&z.type!=="boss"){const dx=z.x-p.x,dy=z.y-p.y,dd=dx*dx+dy*dy;if(dd<70*70){const l=Math.sqrt(dd)||1;z.kx+=dx/l*90;z.ky+=dy/l*90}}}G.shake=Math.max(G.shake,6);sfx("hurt");txt(p.x,p.y-20,"-"+Math.round(d),"#f87171");
@@ -623,15 +623,15 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden){pause();cS
 
 // comic
 const INTRO=[
- {cap:"NICEVILLE, FL — Saturday",art:"👦📱🏡👴",t:"Remy lives with Granddad Paul in Niceville. He's on the phone with Dad, complaining that Granddad only owns ONE TV channel.",b:"Remy: \"Dad, he watches the weather channel. For FUN.\""},
- {cap:"MEANWHILE, IN PAMPLICO, SC",art:"👨📞🧟🧟",t:"Dad's voice gets weird. Something is moaning in the background, and it isn't the dog.",b:"Dad: \"Remy, listen. Zombies are showing up in Pamplico! Mom, Leo and I are locking down the house. COME HOME—\" *bzzzt*"},
- {cap:"CALL DROPPED",art:"📵😱",t:"No bars. No Dad. Outside, Bill from next door is chewing on his own mailbox. Bill was always a little weird, but this is new.",b:"Remy: \"Dad? DAD?! ...Leo better not be eating my snacks.\""},
- {cap:"GRANDPA'S GARAGE",art:"👴🐔➡️👦",t:"Granddad pulls a dusty box from the shelf and hands Remy... a rubber chicken launcher.",b:"Granddad: \"I built this in '83 for exactly this day. Go get your family, kiddo. Text me when you're there. ...I don't know how to read texts.\""},
+ {cap:"NICEVILLE, FL — Saturday",art:"👦📱🏡👴",t:"Remy lives with Granddad Paul in Niceville. Right now he's on the phone with Dad, complaining. Loudly. Granddad's TV gets exactly ONE channel.",b:"Remy: \"Dad, he watches the weather channel. For FUN. He takes NOTES.\""},
+ {cap:"MEANWHILE, IN PAMPLICO, SC",art:"👨📞🧟🧟",t:"Then Dad's voice gets weird and quiet. Something is moaning in the background. And it's NOT the dog.",b:"Dad: \"Remy, listen to me. Zombies. In Pamplico. Real ones! Mom, Leo and I are locking down the house. We need you. COME HOME—\" *bzzzt*"},
+ {cap:"CALL DROPPED",art:"📵😱",t:"No bars. No Dad. Outside, Bill from next door is chewing on his own mailbox. Bill has always been weird, but even Bill doesn't usually eat the mail.",b:"Remy: \"Dad? DAD?! ...Okay. Okay. Leo better not be eating my snacks.\""},
+ {cap:"GRANDDAD'S GARAGE",art:"👴🐔➡️👦",t:"Granddad blows the dust off a mystery box, opens it very slowly, and hands Remy... a rubber chicken launcher.",b:"Granddad: \"I built this in '83 for exactly this day. Everybody laughed. Go get your family, kiddo. Text me when you get there. ...Actually, call. I can't read texts.\""},
  {cap:"THE ROAD HOME",art:"🗺️🚶‍♂️🧟‍♀️🧟",t:"Niceville to Pamplico: about 450 miles of zombies, traffic, and questionable gas station snacks.",b:"Remy: \"Hang on, Mom, Dad, Leo. I'm coming home!\""}];
 const ENDING=[
- {cap:"PAMPLICO, SC — HOME",art:"🏠🧟‍♂️💥👦",t:"The Mayor of Zombietown goes down in a cloud of goo. The front door creaks open...",b:"Remy: \"Mom? Dad? It's me!\""},
- {cap:"FAMILY REUNION",art:"👩👨👦🧒❤️",t:"Mom squeezes him so hard he squeaks like a rubber chicken. Dad does the embarrassing happy dance. Leo, 6, runs in wearing a pot on his head.",b:"Leo: \"I KNEW you'd come! Also I ate your snacks.\""},
- {cap:"SAFE AT LAST",art:"🛋️🍕📞👴",t:"The whole family piles on the couch. The phone rings. It's Granddad.",b:"Granddad: \"Did the chicken work?\"  Remy: \"Granddad... the chicken SAVED THE WORLD.\"   THE END 🎉"}];
+ {cap:"PAMPLICO, SC — HOME",art:"🏠🧟‍♂️💥👦",t:"The Mayor of Zombietown goes down in a big green cloud of goo. Quiet. Then the front door creaks open...",b:"Remy: \"Mom? Dad? Leo? It's me! I brought a chicken!\""},
+ {cap:"FAMILY REUNION",art:"👩👨👦🧒❤️",t:"Mom squeezes him so hard he squeaks like a rubber chicken. Dad does his embarrassing happy dance. Twice. Leo, 6, runs in wearing a pot on his head.",b:"Leo: \"I KNEW you'd come! The pot is my helmet. Also I ate your snacks.\""},
+ {cap:"SAFE AT LAST",art:"🛋️🍕📞👴",t:"The whole family piles onto one couch. Nobody lets go. Then the phone rings. It's Granddad.",b:"Granddad: \"Did the chicken work?\"  Remy: \"Granddad... the chicken SAVED THE WORLD.\"   THE END 🎉"}];
 // ===== Comic book intro (presentation only; words come unchanged from INTRO/ENDING) =====
 const SCENE={INTRO:["home","call","dropped","garage","road"],ENDING:["door","family","couch"]};const PART={};
 function cHum(g,x,y,s,col,o={}){// grounded figure: legs, torso, arms, head, baked shade
@@ -798,9 +798,9 @@ const CSC={ // id -> beats. fx: zoom | pan | shadow | flick | none. d = ms. Tota
 function cutLine(i){const L=window.CUT_LINES||[],id=townName(i).toLowerCase(),e=L.find(x=>x.id===id);const t=e&&e.line||"";const ph=!t.trim()||/^\s*\[.*\]\s*$/.test(t);return{id,ph,text:ph?"...":t,who:(e&&e.who)||"Remy"}}
 function townCut(i,done){cStop();clearTimeout(cutT);state="cut";show("cut");const land=innerWidth>innerHeight,aw=Math.round(land?Math.min(innerWidth-40,760):innerWidth-24),ah=Math.round(land?innerHeight-110:Math.min(innerHeight*.62,560));
  const id=townName(i).toLowerCase(),beats=CSC[id]||CSC.tallahassee,ln=cutLine(i);window.__cutId=id;window.__cutBeats=beats.length;window.__cutLine=ln;
- const P=$("cutP");P.innerHTML=`<div class="cart cpanel tr-cut cscene" style="width:${aw}px;height:${ah}px"><div class="cap">${STAGES[i].n}</div><div class="bub cbub"></div></div>`;const box=P.firstChild;box.querySelector(".cbub").textContent=ln.ph?"...":ln.who+': "'+ln.text+'"';
+ const P=$("cutP");P.innerHTML=`<div class="cart cpanel tr-cut cscene" style="width:${aw}px;height:${ah}px"><div class="cutHead"><div class="cap">${STAGES[i].n}</div><div class="bub cbub"></div></div></div>`;const box=P.firstChild;box.querySelector(".cbub").textContent=ln.ph?"...":ln.who+': "'+ln.text+'"';
  const els=beats.map((b,k)=>{const ww=Math.round(aw*(b.wide||1));let cv;if(!b.art){const src=cutArt(i,aw,ah);cv=document.createElement("canvas");cv.width=src.width;cv.height=src.height;cv.getContext("2d").drawImage(src,0,0)}else{cv=document.createElement("canvas");cv.width=ww*2;cv.height=ah*2;const g=cv.getContext("2d");g.scale(2,2);b.art(g,ww,ah,i);cFin(g,ww,ah)}
-  const d=document.createElement("div");d.className="beat fx-"+b.fx;d.style.setProperty("--d",b.d+"ms");d.style.setProperty("--vw",aw+"px");cv.style.width=ww+"px";cv.style.height=ah+"px";d.appendChild(cv);if(b.fx==="shadow"||b.fx==="flick"){const o=document.createElement("div");o.className="ov";d.appendChild(o)}box.insertBefore(d,box.querySelector(".cbub"));return d});
+  const d=document.createElement("div");d.className="beat fx-"+b.fx;d.style.setProperty("--d",b.d+"ms");d.style.setProperty("--vw",aw+"px");cv.style.width=ww+"px";cv.style.height=ah+"px";d.appendChild(cv);if(b.fx==="shadow"||b.fx==="flick"){const o=document.createElement("div");o.className="ov";d.appendChild(o)}box.insertBefore(d,box.querySelector(".cutHead"));return d});
  let k=0,t0=0;const step=()=>{els.forEach((e,j)=>e.classList.toggle("on",j===k));window.__cutBeat=k;if(k<els.length-1){cutT=setTimeout(()=>{k++;step()},beats[k].d)}};step();
  const total=Math.max(10000,Math.min(15000,beats.reduce((a,b)=>a+b.d,0)+500));window.__cutTotal=total;
  const fin=()=>{clearTimeout(cutT);clearTimeout(cutE);cStop();if(state==="cut")done()};$("cutS").onclick=fin;window.__cutSpeak=ln.ph?false:cSpeak('"'+ln.text+'"');cutE=setTimeout(fin,total);window.__cutTown=townName(i)}
@@ -855,7 +855,7 @@ function endRun(won,quit){if(state==="over")return;state="over";hudBtns(false);c
  const dn=$("dadNote");if(!won&&!quit){const n=nextDadNote();if(n){dn.innerHTML='<div class="dadT">💌 A note from Dad</div><div class="dadB"></div><div class="dadS">— Dad</div>';dn.querySelector(".dadB").textContent=n;dn.classList.remove("hidden")}else dn.classList.add("hidden")}else dn.classList.add("hidden");
  const vc=$("verseCard");vc.classList.add("hidden");if(!won&&!quit){const dc=LS.get("deaths",0)+1;LS.set("deaths",dc);if(dc%10===0){const v=bagPick(window.GENEVA_VERSES,"verse");if(v){vc.innerHTML='<div class="vT">📜 A word for the road</div><div class="vB"></div><div class="vR"></div>';vc.querySelector(".vB").textContent=v.text;vc.querySelector(".vR").textContent="— "+v.ref;vc.classList.remove("hidden")}}}
  $("overT").textContent=won?"STAGE CLEARED! 🎉":quit?"Run abandoned 🏳️":pick(["GOO'D GAME 💀","YOU GOT NOMMED 🧟","BRAAAINS... yours. 🧠"]);
- $("overSub").textContent=won?(finale?"You made it HOME!":"Next stop: "+STAGES[G.stage+1].n):pick(["The zombies say thanks for the snack.","Granddad believes in you. Try again!","Leo is still waiting! Get back out there."]);
+ $("overSub").textContent=won?(finale?"You made it HOME!":"Next stop: "+STAGES[G.stage+1].n):pick(["The zombies say thanks for the snack.","Granddad believes in you. So does the chicken.","Leo is still waiting! And probably eating your snacks."]);
  $("res").innerHTML=`⏱ Survived <b>${mm}:${ss}</b><br>💀 Zombies gooed: <b>${G.kills}</b><br>⭐ Level: <b>${G.lvl}</b><br>🏆 Score: <b>${sc}</b><br>🪙 Coins earned: <b>+${earned}</b>`;
  const top=LS.get("top_"+save.diff,[]);pendingScore={s:sc,t:Math.floor(G.t),k:G.kills,l:G.lvl,h:HEROES[G.hero].i,m:G.mode==="journey"?STAGES[G.stage].n.split(",")[0]:"Endless"};
  const qualifies=sc>0&&(top.length<10||sc>top[top.length-1].s);$("overBoard").innerHTML="";
