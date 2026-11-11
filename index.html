@@ -16,6 +16,7 @@ p{margin:0;font-size:16px;max-width:360px;line-height:1.4}
 .btn{font-size:22px;font-weight:900;padding:12px 30px;border:0;border-radius:30px;background:#a3e635;color:#1a2e05;box-shadow:0 5px 0 #3f6212;min-width:220px}
 .btn.sm{font-size:17px;padding:9px 20px;min-width:0}.btn.alt{background:#facc15;box-shadow:0 5px 0 #a16207;color:#422006}.btn.blue{background:#22d3ee;box-shadow:0 5px 0 #0e7490;color:#083344}
 .btn.dim{background:#334155;color:#cbd5e1;box-shadow:0 4px 0 #0f172a}.btn:disabled{opacity:.45}
+#iupd{max-width:min(340px,100%);white-space:normal;line-height:1.25;box-sizing:border-box}
 .hidden{display:none!important}
 .card{background:#0007;border-radius:14px;padding:10px 14px;font-size:16px;line-height:1.45}
 .up{display:flex;gap:10px;align-items:center;width:100%;max-width:370px;text-align:left;border:3px solid #a3e635;background:#1e293bee;color:#fff;border-radius:16px;padding:10px;font-size:15px}
@@ -69,7 +70,7 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <p id="coinS" class="card">🪙 0</p>
 <div id="diffRow" class="row"></div><p id="diffInfo" style="font-size:13px;opacity:.85"></p><button class="btn" id="journeyB" style="font-size:28px;padding:16px 34px;min-width:270px">🗺️ JOURNEY HOME ▶<br><small style="font-size:14px;font-weight:700">Story mode: beat each town's boss</small></button><button class="btn sm" id="endlessB" style="background:#6d28d9;color:#fff;box-shadow:0 4px 0 #3b0764">♾️ Endless Mode <small>(no story, bosses forever)</small></button>
 <div class="row"><button class="btn sm" id="heroB">🧑 Heroes</button><button class="btn sm" id="shopB">🛒 Shop</button><button class="btn sm" id="topB">🏆 Top 10</button><button class="btn sm" id="storyB">📖 Story</button></div>
-<button class="btn sm blue" id="installBtn">📲 Install app</button><div id="installHelp" class="card hidden">Tap Chrome's <b>⋮</b> menu → <b>Install app</b> / <b>Add to Home screen</b><br><small>(iPhone: Share ⬆️ → Add to Home Screen)</small><br><button class="btn sm" id="helpOk">OK</button></div>
+<div class="row"><button class="btn sm blue" id="installBtn">📲 Install app</button><button class="btn sm" id="iupd" type="button">Check for update</button></div><div id="installHelp" class="card hidden">Tap Chrome's <b>⋮</b> menu → <b>Install app</b> / <b>Add to Home screen</b><br><small>(iPhone: Share ⬆️ → Add to Home Screen)</small><br><button class="btn sm" id="helpOk">OK</button></div>
 <button class="btn sm" id="muteB" style="background:#334155;color:#fff;box-shadow:0 4px 0 #0f172a;font-size:20px">🔊 Sound on</button></div>
 <div class="screen center hidden" id="cut"><div id="cutP"></div><button class="btn sm alt" id="cutS">Skip ⏭</button></div><div class="screen center hidden" id="comic"><div id="comicP"></div><div class="row"><button class="btn" id="comicN">Next ▶</button><button class="btn sm alt" id="comicS">Skip ⏭</button></div></div>
 <div class="screen center hidden" id="class"><h2>Pick a class</h2><p>Only for this run. You will pick again next time.</p>
@@ -87,7 +88,7 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <div id="overBoard"></div><div id="overBtns" style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn" id="againB">🔁 Again</button><button class="btn sm alt" id="homeB">🏠 Home</button></div></div>
 <div class="screen hidden" id="board"><h2 id="boardTitle">🏆 Top 10</h2><div id="boardList"></div><button class="btn sm" id="boardBack">⬅ Back</button></div>
 <script src="dadnotes.js?v=14"></script><script src="verses.js?v=14"></script><script src="towns-data.js?v=14"></script><script src="cutscene-lines.js?v=15"></script><script src="game.js?v=17"></script>
-<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=17');
+<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=18');
 let deferredPrompt=null;const ib=document.getElementById("installBtn"),hp=document.getElementById("installHelp");
 const standalone=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||navigator.standalone;
 if(standalone())ib.classList.add("hidden");
@@ -95,4 +96,17 @@ addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e})
 addEventListener("appinstalled",()=>{ib.classList.add("hidden");hp.classList.add("hidden");deferredPrompt=null});
 ib.onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();const r=await deferredPrompt.userChoice;deferredPrompt=null;if(r.outcome==="accepted")ib.classList.add("hidden")}else hp.classList.remove("hidden")};
 document.getElementById("helpOk").onclick=()=>hp.classList.add("hidden");
+// Check for update: same helper as Secret Adventures intro.js (Plato-based). Selectors adapted to #iupd.
+let upd="idle",ready=false;
+const LAB={idle:"Check for update",checking:"Checking…",current:"You’re up to date",ready:"Update ready — tap to reload",failed:"Try again when you’re online"};
+function setUpd(s){upd=s;if(s==="ready")ready=true;paint();if(s==="current")setTimeout(()=>{if(upd==="current"){upd="idle";paint();}},2500);}
+function paint(){const u=document.getElementById("iupd");if(!u)return;u.textContent=ready?LAB.ready:LAB[upd];}
+async function check(){if(ready){location.reload();return;}
+ const sw=navigator.serviceWorker;if(!navigator.onLine||!sw||location.protocol==="file:"){setUpd("failed");return;}
+ setUpd("checking");try{const reg=await sw.getRegistration();if(!reg){setUpd("failed");return;}await reg.update();
+  const nw=reg.installing||reg.waiting;if(!nw){setUpd("current");return;}
+  const done=()=>{if(nw.state==="activated"||nw.state==="installed")setUpd("ready");else if(nw.state==="redundant")setUpd("failed");};
+  nw.addEventListener("statechange",done);done();}catch(e){setUpd("failed");}}
+if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.addEventListener("controllerchange",()=>setUpd("ready"));
+document.getElementById("iupd").addEventListener("click",e=>{e.preventDefault();e.stopPropagation();check();});
 </script></body></html>
