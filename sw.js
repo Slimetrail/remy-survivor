@@ -1,5 +1,5 @@
-const VER="16",CACHE="remysurv-v"+VER;
-const SHELL=["./","index.html","dadnotes.js?v=14","verses.js?v=14","towns-data.js?v=14","cutscene-lines.js?v=14","game.js?v=14","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/maskable-512.png"];
+const VER="16-splash1",CACHE="remysurv-v"+VER;
+const SHELL=["./","index.html","dadnotes.js?v=14","verses.js?v=14","towns-data.js?v=14","cutscene-lines.js?v=14","game.js?v=14","slimesplash/splash.js?v=1","slimesplash/splash.css?v=1","slimesplash/logo3-neon-chosen-v1.jpg","slimesplash/logo-sound-3-neon-glow.mp3","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/maskable-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL.map(u=>new Request(u,{cache:"reload"})))).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith("remysurv-")&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET"||new URL(r.url).origin!==location.origin)return;
