@@ -51,6 +51,11 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 .cscene .ov{position:absolute;inset:0;pointer-events:none}.cscene .fx-flick .ov{background:rgba(120,110,220,.18);animation:fk 1.9s steps(1) infinite}@keyframes fk{0%{opacity:1}8%{opacity:.1}12%{opacity:1}55%{opacity:.6}58%{opacity:0}62%{opacity:1}}
 .cscene .beat.on.fx-shadow .ov{background:linear-gradient(90deg,transparent 0,rgba(0,0,0,.75) 6%,rgba(0,0,0,.75) 22%,transparent 28%);background-size:200% 100%;animation:fsh var(--d) linear forwards}@keyframes fsh{from{background-position:120% 0}to{background-position:-30% 0}}
 .cscene .cbub,.cscene .cap{z-index:2;line-height:1.3}
+.cls{font-size:26px;font-weight:900;padding:18px 16px;border:0;border-radius:24px;min-width:280px;width:100%;max-width:340px;line-height:1.15}
+.cls small{display:block;font-size:15px;font-weight:800;margin-top:4px;opacity:.92}
+.cls.ranged{background:#a3e635;color:#1a2e05;box-shadow:0 6px 0 #3f6212}
+.cls.melee{background:#facc15;color:#422006;box-shadow:0 6px 0 #a16207}
+.cls.mage{background:#c084fc;color:#2e1065;box-shadow:0 6px 0 #6b21a8}
 </style></head><body>
 <script src="slimesplash/splash.js?v=1" data-base="slimesplash/" data-sound="1"></script>
 <canvas id="c"></canvas>
@@ -63,6 +68,11 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <button class="btn sm blue" id="installBtn">📲 Install app</button><div id="installHelp" class="card hidden">Tap Chrome's <b>⋮</b> menu → <b>Install app</b> / <b>Add to Home screen</b><br><small>(iPhone: Share ⬆️ → Add to Home Screen)</small><br><button class="btn sm" id="helpOk">OK</button></div>
 <button class="btn sm" id="muteB" style="background:#334155;color:#fff;box-shadow:0 4px 0 #0f172a;font-size:20px">🔊 Sound on</button></div>
 <div class="screen center hidden" id="cut"><div id="cutP"></div><button class="btn sm alt" id="cutS">Skip ⏭</button></div><div class="screen center hidden" id="comic"><div id="comicP"></div><div class="row"><button class="btn" id="comicN">Next ▶</button><button class="btn sm alt" id="comicS">Skip ⏭</button></div></div>
+<div class="screen center hidden" id="class"><h2>Pick a class</h2><p>Only for this run. You will pick again next time.</p>
+<button class="cls ranged" id="clsRanged">🎯 Ranged<small>The usual shooter</small></button>
+<button class="cls melee" id="clsMelee">🍎 Melee<small>Pillowcase of Apples</small></button>
+<button class="cls mage" id="clsMage">🎆 Mage<small>Bottle rocket fireworks</small></button>
+<button class="btn sm dim" id="classBack">⬅ Back</button></div>
 <div class="screen hidden" id="map"><h2>🗺️ The Road Home</h2><canvas id="mapC" width="720" height="840"></canvas><div id="mapInfo" class="card"></div><button class="btn" id="mapGo">▶ Play stage</button><button class="btn sm" id="mapBack">⬅ Back</button></div>
 <div class="screen hidden" id="heroes"><h2>🧑 Heroes</h2><div id="heroList" style="display:flex;flex-direction:column;gap:8px;align-items:center;width:100%"></div><button class="btn sm" id="heroBack">⬅ Back</button></div>
 <div class="screen hidden" id="shop"><h2>🛒 Garage Sale of Power</h2><p id="shopCoins" class="card"></p><div id="shopList" style="display:flex;flex-direction:column;gap:8px;align-items:center;width:100%"></div><button class="btn sm" id="shopBack">⬅ Back</button></div>
@@ -72,8 +82,8 @@ table{border-collapse:collapse;font-size:14px;background:#0007;border-radius:12p
 <div id="ini" class="hidden"><p><b>🎉 Top 10! Pick your initials</b></p><div id="iniCols"></div><br><button class="btn" id="iniSave">✔ Save</button></div>
 <div id="overBoard"></div><div id="overBtns" style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn" id="againB">🔁 Again</button><button class="btn sm alt" id="homeB">🏠 Home</button></div></div>
 <div class="screen hidden" id="board"><h2 id="boardTitle">🏆 Top 10</h2><div id="boardList"></div><button class="btn sm" id="boardBack">⬅ Back</button></div>
-<script src="dadnotes.js?v=14"></script><script src="verses.js?v=14"></script><script src="towns-data.js?v=14"></script><script src="cutscene-lines.js?v=14"></script><script src="game.js?v=14"></script>
-<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=14');
+<script src="dadnotes.js?v=14"></script><script src="verses.js?v=14"></script><script src="towns-data.js?v=14"></script><script src="cutscene-lines.js?v=14"></script><script src="game.js?v=15"></script>
+<script>if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js?v=15');
 let deferredPrompt=null;const ib=document.getElementById("installBtn"),hp=document.getElementById("installHelp");
 const standalone=()=>matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||navigator.standalone;
 if(standalone())ib.classList.add("hidden");
